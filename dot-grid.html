@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Grille de points A4 - Bullet Journal</title>
+    <style>
+        @import url('https://fonts.bunny.net/css?family=inter:300|oswald:300,400');
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        body {
+            margin: 0;
+            padding: 40px; /* espace autour de la page pour voir le fond gris */
+            background: #ccc;
+            min-height: 100vh;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        /* Div en surimpression centrée */
+        #info {
+            font-family: 'Inter', sans-serif;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px; /* largeur réduite */
+            background: #333;
+            color: #eee;
+            padding: 1em;
+            font-size: 1.5vmax;
+            border-radius: .2em;
+            text-align: center; /* centrer le texte */
+        }
+        #info p {
+            text-align: left;
+            margin: 0 0 0.5em 0;
+            line-height: 135%;
+        }
+        #info a {
+            color: inherit;
+        }
+        /* Conteneur simulant la page A4 */
+        .paper {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+        }
+        /* Centrage de l'élément SVG à l'intérieur de la page */
+        svg {
+            display: block;
+            margin: auto;
+        }
+        /* Styles pour l'impression */
+        @media print {
+            body {
+                padding: 0;
+                background: none;
+                display: block;
+            }
+            #info {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <p>Cette page est imprimable sur un format de papier A4 afin d'obtenir une grille de points espacés de 5 mm.</p>
+        <p style="font-size: 80%; color: #999;"><a href="https://github.com/alexandregrignon/printable-paper-templates">Source</a></p>
+    </div>
+    <div class="paper">
+        <svg id="grid" width="210mm" height="297mm" xmlns="http://www.w3.org/2000/svg">
+            <!-- La grille de points sera générée par le script -->
+        </svg>
+    </div>
+
+    <script>
+        (function(){
+            // Dimensions de la page A4 en mm
+            var pageWidth = 210;
+            var pageHeight = 297;
+
+            // Marge de 5mm tout autour
+            var pageMargin = 5;
+            
+            // Calcul de la zone effective
+            var effectiveWidth = pageWidth - 2 * pageMargin;
+            var effectiveHeight = pageHeight - 2 * pageMargin;
+
+            // Espacement des points en mm
+            var spacing = 5;
+
+            // Calcul du nombre de points pour chaque axe dans la zone effective
+            var nX = Math.floor(effectiveWidth / spacing) + 1;
+            var nY = Math.floor(effectiveHeight / spacing) + 1;
+
+            // Calcul de marge additionnelle pour centrer la grille
+            var extraMarginX = (effectiveWidth - (nX - 1) * spacing) / 2;
+            var extraMarginY = (effectiveHeight - (nY - 1) * spacing) / 2;
+
+            // La marge totale à appliquer depuis le bord de la page
+            var marginX = pageMargin + extraMarginX;
+            var marginY = pageMargin + extraMarginY;
+
+            var svg = document.getElementById("grid");
+
+            // Création d'un point (cercle) discret : petit rayon et couleur grise
+            for (var i = 0; i < nX; i++) {
+                for (var j = 0; j < nY; j++) {
+                    var cx = marginX + i * spacing;
+                    var cy = marginY + j * spacing;
+                    var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    circle.setAttribute("cx", cx + "mm");
+                    circle.setAttribute("cy", cy + "mm");
+                    circle.setAttribute("r", "0.25mm");
+                    circle.setAttribute("fill", "#ccc");
+                    svg.appendChild(circle);
+                }
+            }
+        })();
+    </script>
+</body>
+</html>
