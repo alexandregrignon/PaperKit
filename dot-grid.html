@@ -16,6 +16,7 @@
             min-height: 100vh;
             box-sizing: border-box;
             display: flex;
+            flex-direction: column; /* passage en colonne */
             justify-content: center;
             align-items: center;
             position: relative;
@@ -43,6 +44,13 @@
         #info a {
             color: inherit;
         }
+        /* Style pour la navigation */
+        nav {
+            font-family: 'Inter', sans-serif;
+            text-align: center;
+            margin-bottom: 1em;
+            width: 100%;
+        }
         /* Conteneur simulant la page A4 */
         .paper {
             width: 210mm;
@@ -64,6 +72,9 @@
             #info {
                 display: none;
             }
+            nav {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -72,6 +83,9 @@
         <p>Cette page est imprimable sur un format de papier A4 afin d'obtenir une grille de points espacés de 5 mm.</p>
         <p style="font-size: 80%; color: #999;"><a href="https://github.com/alexandregrignon/printable-paper-templates">Source</a></p>
     </div>
+    <nav style="text-align: center; margin-bottom: 1em;">
+        <a href="index.html">&larr; retour à liste des templates</a>
+    </nav>
     <div class="paper">
         <svg id="grid" width="210mm" height="297mm" xmlns="http://www.w3.org/2000/svg">
             <!-- La grille de points sera générée par le script -->
