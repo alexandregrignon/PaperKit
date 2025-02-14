@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réglure Seyès Adaptative en SVG</title>
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: white;
+        }
+
+        .page {
+            width: 100vw; /* S'adapte à la largeur imprimable */
+            min-height: 100vh; /* Prend toute la hauteur imprimable */
+            position: relative;
+            background: white;
+        }
+
+        .marge {
+            position: absolute;
+            height: 100%;
+            left: 2cm;
+            border-left: 1px solid red; /* Ligne rouge fine */
+            z-index: 1;
+        }
+
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="marge"></div>
+    </div>
+
+    <script>
+        function genererLignesSvg() {
+            const page = document.querySelector(".page");
+            // Réinitialise la page en gardant la marge (ligne rouge via .marge)
+            page.innerHTML = '<div class="marge"></div>';
+            
+            // Utilisation des dimensions réelles de la zone d'affichage
+            const largeurPage = page.offsetWidth;
+            const hauteurPage = page.offsetHeight;
+
+            // Créer l'élément SVG couvrant toute la page
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("width", largeurPage);
+            svg.setAttribute("height", hauteurPage);
+            // Ajout du viewBox et du preserveAspectRatio pour une adaptation en fonction du format (portrait ou paysage)
+            svg.setAttribute("viewBox", `0 0 ${largeurPage} ${hauteurPage}`);
+            svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+            svg.setAttribute("style", "position: absolute; top: 0; left: 0;");
+            page.appendChild(svg);
+
+            const mmToPx = 96 / 25.4; // Environ 3.78 px par mm
+            const hauteurLigne = 8; // 8 mm par ligne
+            const hauteurLignePx = hauteurLigne * mmToPx;
+            const nombreLignes = Math.floor(hauteurPage / hauteurLignePx);
+
+            // Lignes horizontales (baseline et interlignes)
+            for (let i = 0; i < nombreLignes; i++) {
+                // Ligne principale (baseline)
+                const y = i * hauteurLignePx;
+                const ligne = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                ligne.setAttribute("x1", "0");
+                ligne.setAttribute("y1", y);
+                ligne.setAttribute("x2", largeurPage);
+                ligne.setAttribute("y2", y);
+                ligne.setAttribute("stroke", "#a8c7e0");
+                ligne.setAttribute("stroke-width", "0.5");
+                svg.appendChild(ligne);
+
+                if (i < nombreLignes - 1) {
+                    // Trois interlignes classiques :
+                    // - À 25% : première interligne
+                    // - À 50% : ligne d'écriture ou x-height
+                    // - À 75% : ligne d'ascenseur
+                    [0.25, 0.5, 0.75].forEach(multiplier => {
+                        const interY = i * hauteurLignePx + (hauteurLignePx * multiplier);
+                        const interLigne = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                        interLigne.setAttribute("x1", "0");
+                        interLigne.setAttribute("y1", interY);
+                        interLigne.setAttribute("x2", largeurPage);
+                        interLigne.setAttribute("y2", interY);
+                        interLigne.setAttribute("stroke", "#d3e3f1");
+                        interLigne.setAttribute("stroke-width", "0.2");
+                        svg.appendChild(interLigne);
+                    });
+                }
+            }
+            
+            // Lignes verticales dans l'aire d'écriture
+            // La zone d'écriture démarre à 2cm (20mm) à partir de la gauche
+            const leftMarginPx = 20 * mmToPx;
+            // Espacement vertical de 8 mm entre colonnes
+            const espacementVertical = 8 * mmToPx;
+            const nombreColonnes = Math.floor((largeurPage - leftMarginPx) / espacementVertical);
+            for (let j = 0; j <= nombreColonnes; j++) {
+                const x = leftMarginPx + j * espacementVertical;
+                const ligneVerticale = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                ligneVerticale.setAttribute("x1", x);
+                ligneVerticale.setAttribute("y1", "0");
+                ligneVerticale.setAttribute("x2", x);
+                ligneVerticale.setAttribute("y2", hauteurPage);
+                ligneVerticale.setAttribute("stroke", "#d3e3f1");
+                ligneVerticale.setAttribute("stroke-width", "0.2");
+                svg.appendChild(ligneVerticale);
+            }
+        }
+
+        // Génération des lignes après chargement de la page
+        window.onload = genererLignesSvg;
+
+        // Regénérer les lignes en cas de redimensionnement
+        window.onresize = genererLignesSvg;
+    </script>
+</body>
+</html>
