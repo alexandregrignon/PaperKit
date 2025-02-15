@@ -201,12 +201,12 @@ input[type="range"]:focus::-ms-fill-upper {
 }
 
 /* Nouveau style pour organiser les sliders */
-.slider-group {
+.option-group {
     margin-top: min(1em, 3vw);
 }
 
 /* Nouveau style pour organiser les sliders sur deux lignes */
-.slider-header {
+.option-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -214,12 +214,12 @@ input[type="range"]:focus::-ms-fill-upper {
     font-size: clamp(12px, 2.5vw, 1em);
 }
 
-.slider-header .label {
+.option-header .label {
     font-size: 0.8em;
     font-weight: bold;
 }
 
-.slider-header .value {
+.option-header .value {
     font-size: 0.8em;
 }
 
@@ -229,13 +229,64 @@ input[type="range"]:focus::-ms-fill-upper {
     gap: 0.5em;
 }
 
+/* Styles pour le toggle switch */
+.toggle-group {
+    margin: 1em 0;
+}
+
+.toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8em;
+    cursor: pointer;
+}
+
+.toggle input {
+    display: none;
+}
+
+.toggle .slider {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+    background-color: #555;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+}
+
+.toggle .slider:before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+.toggle input:checked + .slider {
+    background-color: #e67e22; /* Orange plus foncé */
+}
+
+.toggle input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+.toggle .label {
+    font-size: 0.9em;
+    user-select: none;
+}
+
 /* Media query pour les très petits écrans */
 @media (max-width: 350px) {
     #info {
         padding: 1em;
     }
     
-    .slider-header {
+    .option-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5em;
