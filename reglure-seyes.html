@@ -2,134 +2,111 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Réglure Seyès Adaptative en SVG</title>
-    <style>
-        @media print {
-            body {
-                -webkit-print-color-adjust: exact;
-            }
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: white;
-        }
-
-        .page {
-            width: 100vw; /* S'adapte à la largeur imprimable */
-            min-height: 100vh; /* Prend toute la hauteur imprimable */
-            position: relative;
-            background: white;
-        }
-
-        .marge {
-            position: absolute;
-            height: 100%;
-            left: 2cm;
-            border-left: 1px solid red; /* Ligne rouge fine */
-            z-index: 1;
-        }
-
-        svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 0;
-        }
-    </style>
+    <title>Réglure Seyès</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="page">
-        <div class="marge"></div>
+    <div id="info">
+        <nav>
+            <a href="index.html">&larr; retour à la liste des templates</a>
+        </nav>
+        <h1>Réglure Seyès (A4)</h1>
+        <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> sur un format de papier A4 pour obtenir un papier Seyès (grands carreaux).</p>
+        <p>Format standard : grille de 21 carreaux x 29 carreaux, soit 609 carreaux complets.</p>
+        <div class="credits">
+            Projet <a href="https://github.com/alexandregrignon/GridKit">GridKit</a> par <a href="https://alexandregrignon.fr">Alexandre Grignon</a>
+        </div>
+    </div>
+    <div class="paper">
+        <svg id="grid" width="210mm" height="297mm" xmlns="http://www.w3.org/2000/svg">
+            <!-- La grille sera générée par le script -->
+        </svg>
     </div>
 
     <script>
-        function genererLignesSvg() {
-            const page = document.querySelector(".page");
-            // Réinitialise la page en gardant la marge (ligne rouge via .marge)
-            page.innerHTML = '<div class="marge"></div>';
-            
-            // Utilisation des dimensions réelles de la zone d'affichage
-            const largeurPage = page.offsetWidth;
-            const hauteurPage = page.offsetHeight;
+        (function(){
+            const pageWidth = 210; // mm
+            const pageHeight = 297; // mm
+            const INTERLINE_HEIGHT = 8; // mm
+            const SQUARES_X = 21; // nombre de carreaux à droite du trait rouge
+            const SQUARES_Y = 29; // nombre de carreaux en hauteur
+            const gridWidth = SQUARES_X * INTERLINE_HEIGHT; // 168mm de zone d'écriture
+            const LEFT_MARGIN = pageWidth - gridWidth; // 42mm (espace restant)
+            const svg = document.getElementById("grid");
 
-            // Créer l'élément SVG couvrant toute la page
-            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            svg.setAttribute("width", largeurPage);
-            svg.setAttribute("height", hauteurPage);
-            // Ajout du viewBox et du preserveAspectRatio pour une adaptation en fonction du format (portrait ou paysage)
-            svg.setAttribute("viewBox", `0 0 ${largeurPage} ${hauteurPage}`);
-            svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
-            svg.setAttribute("style", "position: absolute; top: 0; left: 0;");
-            page.appendChild(svg);
+            function createGrid() {
+                const gridHeight = SQUARES_Y * INTERLINE_HEIGHT;
+                const marginY = (pageHeight - gridHeight) / 2;
 
-            const mmToPx = 96 / 25.4; // Environ 3.78 px par mm
-            const hauteurLigne = 8; // 8 mm par ligne
-            const hauteurLignePx = hauteurLigne * mmToPx;
-            const nombreLignes = Math.floor(hauteurPage / hauteurLignePx);
-
-            // Lignes horizontales (baseline et interlignes)
-            for (let i = 0; i < nombreLignes; i++) {
-                // Ligne principale (baseline)
-                const y = i * hauteurLignePx;
-                const ligne = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                ligne.setAttribute("x1", "0");
-                ligne.setAttribute("y1", y);
-                ligne.setAttribute("x2", largeurPage);
-                ligne.setAttribute("y2", y);
-                ligne.setAttribute("stroke", "#a8c7e0");
-                ligne.setAttribute("stroke-width", "0.5");
-                svg.appendChild(ligne);
-
-                if (i < nombreLignes - 1) {
-                    // Trois interlignes classiques :
-                    // - À 25% : première interligne
-                    // - À 50% : ligne d'écriture ou x-height
-                    // - À 75% : ligne d'ascenseur
-                    [0.25, 0.5, 0.75].forEach(multiplier => {
-                        const interY = i * hauteurLignePx + (hauteurLignePx * multiplier);
-                        const interLigne = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                        interLigne.setAttribute("x1", "0");
-                        interLigne.setAttribute("y1", interY);
-                        interLigne.setAttribute("x2", largeurPage);
-                        interLigne.setAttribute("y2", interY);
-                        interLigne.setAttribute("stroke", "#d3e3f1");
-                        interLigne.setAttribute("stroke-width", "0.2");
-                        svg.appendChild(interLigne);
-                    });
+                // Nettoyage du SVG
+                while (svg.firstChild) {
+                    svg.removeChild(svg.firstChild);
                 }
-            }
-            
-            // Lignes verticales dans l'aire d'écriture
-            // La zone d'écriture démarre à 2cm (20mm) à partir de la gauche
-            const leftMarginPx = 20 * mmToPx;
-            // Espacement vertical de 8 mm entre colonnes
-            const espacementVertical = 8 * mmToPx;
-            const nombreColonnes = Math.floor((largeurPage - leftMarginPx) / espacementVertical);
-            for (let j = 0; j <= nombreColonnes; j++) {
-                const x = leftMarginPx + j * espacementVertical;
-                const ligneVerticale = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                ligneVerticale.setAttribute("x1", x);
-                ligneVerticale.setAttribute("y1", "0");
-                ligneVerticale.setAttribute("x2", x);
-                ligneVerticale.setAttribute("y2", hauteurPage);
-                ligneVerticale.setAttribute("stroke", "#d3e3f1");
-                ligneVerticale.setAttribute("stroke-width", "0.2");
-                svg.appendChild(ligneVerticale);
-            }
-        }
 
-        // Génération des lignes après chargement de la page
-        window.onload = genererLignesSvg;
+                // Création des groupes de lignes
+                const mainLines = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                mainLines.setAttribute("stroke", "#a8c7e0");
+                mainLines.setAttribute("stroke-width", "0.5");
 
-        // Regénérer les lignes en cas de redimensionnement
-        window.onresize = genererLignesSvg;
+                const subLines = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                subLines.setAttribute("stroke", "#d3e3f1");
+                subLines.setAttribute("stroke-width", "0.2");
+
+                // Lignes horizontales
+                for (let i = 0; i <= SQUARES_Y; i++) {
+                    const y = marginY + (i * INTERLINE_HEIGHT);
+                    
+                    // Ligne principale (de 0 jusqu'à la fin de la zone d'écriture)
+                    const mainLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    mainLine.setAttribute("x1", "0");
+                    mainLine.setAttribute("y1", y + "mm");
+                    mainLine.setAttribute("x2", (LEFT_MARGIN + gridWidth) + "mm");
+                    mainLine.setAttribute("y2", y + "mm");
+                    mainLines.appendChild(mainLine);
+
+                    if (i < SQUARES_Y) {
+                        // Interlignes (également depuis 0)
+                        [0.25, 0.5, 0.75].forEach(ratio => {
+                            const subY = y + (INTERLINE_HEIGHT * ratio);
+                            const subLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                            subLine.setAttribute("x1", "0");
+                            subLine.setAttribute("y1", subY + "mm");
+                            subLine.setAttribute("x2", (LEFT_MARGIN + gridWidth) + "mm");
+                            subLine.setAttribute("y2", subY + "mm");
+                            subLines.appendChild(subLine);
+                        });
+                    }
+                }
+
+                // Lignes verticales (de haut en bas de la page)
+                for (let i = 0; i <= SQUARES_X; i++) {
+                    const x = LEFT_MARGIN + (i * INTERLINE_HEIGHT);
+                    const vertLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    vertLine.setAttribute("x1", x + "mm");
+                    vertLine.setAttribute("y1", "0");
+                    vertLine.setAttribute("x2", x + "mm");
+                    vertLine.setAttribute("y2", pageHeight + "mm");
+                    subLines.appendChild(vertLine);
+                }
+
+                // Ligne de marge rouge (de haut en bas de la page)
+                const marginLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                marginLine.setAttribute("x1", LEFT_MARGIN + "mm");
+                marginLine.setAttribute("y1", "0");
+                marginLine.setAttribute("x2", LEFT_MARGIN + "mm");
+                marginLine.setAttribute("y2", pageHeight + "mm");
+                marginLine.setAttribute("stroke", "#ff0000");
+                marginLine.setAttribute("stroke-width", "0.5");
+
+                // Ajout des éléments au SVG
+                svg.appendChild(subLines);
+                svg.appendChild(mainLines);
+                svg.appendChild(marginLine);
+            }
+
+            // Création initiale de la grille
+            createGrid();
+        })();
     </script>
 </body>
 </html>

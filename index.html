@@ -3,42 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <title>GridKit - printable paper templates</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
+        @import url('https://fonts.bunny.net/css?family=inter:300,600|oswald:300,400');
+        
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 20px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            margin: 0;
+            padding: 20px;
             background-color: #f9f9f9;
+            text-align: center;
         }
         h1 {
+            font-family: 'Oswald', sans-serif;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #333;
+            margin-bottom: 0;
+        }
+        p {
+            font-weight: 300;
+            letter-spacing: 0.02em;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .grid-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
             color: #333;
         }
-        ul {
-            list-style-type: none;
-            padding: 0;
+        .icon-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
-        li {
-            margin: 10px 0;
+        .icon-circle i {
+            font-size: 48px;
+            color: #666666;
         }
-        a {
-            text-decoration: none;
-            color: #007bff;
+        .grid-item:hover .icon-circle {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
-        a:hover {
-            text-decoration: underline;
+        .grid-item span {
+            font-weight: 600;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <h1>GridKit</h1>
     <p>printable paper templates</p>
-    <ul>
-        <li><a href="dot-grid.html">Dot Grid</a></li>
-        <li><a href="graph-paper.html">Graph Paper</a></li>
-        <li><a href="lined-paper.html">Lined Paper</a></li>
-        <li><a href="isometric.html">Isometric Grid</a></li>
-        <li><a href="year-calendar.html">Year Calendar</a></li>
-        <li><a href="week-calendar.html">Week Calendar</a></li>
-        <li><a href="reglure-seyes.html">Réglure Seyès</a></li>
-    </ul>
+    <div class="grid-container">
+        <a href="dot-grid.html" class="grid-item">
+            <div class="icon-circle">
+                <i class="ph ph-dots-nine"></i>
+            </div>
+            <span>Dot Grid</span>
+        </a>
+        <a href="graph-paper.html" class="grid-item">
+            <div class="icon-circle">
+                <i class="ph ph-grid-four"></i>
+            </div>
+            <span>Graph Paper</span>
+        </a>
+        <a href="lined-paper.html" class="grid-item">
+            <div class="icon-circle">
+                <i class="ph ph-list"></i>
+            </div>
+            <span>Lined Paper</span>
+        </a>
+        <a href="isometric.html" class="grid-item">
+            <div class="icon-circle">
+                <i class="ph ph-cube"></i>
+            </div>
+            <span>Isometric Grid</span>
+        </a>
+        <a href="year-calendar.html" class="grid-item">
+            <div class="icon-circle">
+                <i class="ph ph-calendar-dots"></i>
+            </div>
+            <span>Year Calendar</span>
+        </a>
+        <a href="week-calendar.html" class="grid-item">
+            <div class="icon-circle">
+                <i class="ph ph-calendar"></i>
+            </div>
+            <span>Week Calendar</span>
+        </a>
+        <a href="reglure-seyes.html" class="grid-item">
+            <div class="icon-circle">
+                <i class="ph ph-book"></i>
+            </div>
+            <span>Réglure Seyès</span>
+        </a>
+        <a href="college-ruled.html" class="grid-item">
+            <div class="icon-circle">
+                <i class="ph ph-list-dashes"></i>
+            </div>
+            <span>College Ruled</span>
+        </a>
+    </div>
 </body>
 </html>

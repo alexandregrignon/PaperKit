@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>College Ruled</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="info">
+        <nav>
+            <a href="index.html">&larr; retour à la liste des templates</a>
+        </nav>
+        <h1>College Ruled (A4)</h1>
+        <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> sur un format de papier A4 pour obtenir un papier ligné de type "College Ruled".</p>
+        <p>Format standard : lignes espacées de 7.1mm (9/32 pouces), marge gauche à 31.75mm (1.25 pouces).</p>
+        <h2>Options</h2>
+        <div class="checkbox-group">
+            <input type="checkbox" id="rightMargin" name="rightMargin">
+            <label for="rightMargin">Ajouter une marge à droite</label>
+        </div>
+        <div class="credits">
+            Projet <a href="https://github.com/alexandregrignon/GridKit">GridKit</a> par <a href="https://alexandregrignon.fr">Alexandre Grignon</a>
+        </div>
+    </div>
+    <div class="paper">
+        <svg id="grid" width="210mm" height="297mm" xmlns="http://www.w3.org/2000/svg">
+            <!-- La grille sera générée par le script -->
+        </svg>
+    </div>
+
+    <script>
+        (function(){
+            const pageWidth = 210; // mm
+            const pageHeight = 297; // mm
+            const LINE_SPACING = 7.1; // mm (9/32 inch)
+            const MARGIN = 31.75; // mm (1.25 inches)
+            const svg = document.getElementById("grid");
+            const rightMarginCheckbox = document.getElementById("rightMargin");
+
+            function createGrid(showRightMargin) {
+                // Nombre de lignes sur la hauteur de la page (en tenant compte de la marge)
+                const nLines = Math.floor((pageHeight - MARGIN) / LINE_SPACING);
+
+                // Nettoyage du SVG
+                while (svg.firstChild) {
+                    svg.removeChild(svg.firstChild);
+                }
+
+                // Création du groupe de lignes
+                const mainLines = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                mainLines.setAttribute("stroke", "#a8c7e0");
+                mainLines.setAttribute("stroke-width", "0.5");
+
+                // Lignes horizontales (en commençant après la marge supérieure)
+                for (let i = 0; i <= nLines; i++) {
+                    const y = MARGIN + (i * LINE_SPACING);
+                    
+                    // Ligne principale (commence à x=0 au lieu de MARGIN)
+                    const mainLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    mainLine.setAttribute("x1", "0");
+                    mainLine.setAttribute("y1", y + "mm");
+                    mainLine.setAttribute("x2", pageWidth + "mm");
+                    mainLine.setAttribute("y2", y + "mm");
+                    mainLines.appendChild(mainLine);
+                }
+
+                // Ligne de marge rouge gauche
+                const leftMarginLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                leftMarginLine.setAttribute("x1", MARGIN + "mm");
+                leftMarginLine.setAttribute("y1", "0");
+                leftMarginLine.setAttribute("x2", MARGIN + "mm");
+                leftMarginLine.setAttribute("y2", pageHeight + "mm");
+                leftMarginLine.setAttribute("stroke", "#ff0000");
+                leftMarginLine.setAttribute("stroke-width", "0.5");
+
+                // Ligne de marge rouge droite (optionnelle)
+                if (showRightMargin) {
+                    const rightMarginLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    rightMarginLine.setAttribute("x1", (pageWidth - MARGIN) + "mm");
+                    rightMarginLine.setAttribute("y1", "0");
+                    rightMarginLine.setAttribute("x2", (pageWidth - MARGIN) + "mm");
+                    rightMarginLine.setAttribute("y2", pageHeight + "mm");
+                    rightMarginLine.setAttribute("stroke", "#ff0000");
+                    rightMarginLine.setAttribute("stroke-width", "0.5");
+                    svg.appendChild(rightMarginLine);
+                }
+
+                // Ajout des éléments au SVG
+                svg.appendChild(mainLines);
+                svg.appendChild(leftMarginLine);
+            }
+
+            function updateGrid() {
+                // Nettoyage du SVG
+                while (svg.firstChild) {
+                    svg.removeChild(svg.firstChild);
+                }
+                createGrid(rightMarginCheckbox.checked);
+            }
+
+            // Event listener pour la case à cocher
+            rightMarginCheckbox.addEventListener("change", updateGrid);
+
+            // Création initiale de la grille
+            createGrid(false);
+        })();
+    </script>
+</body>
+</html>
