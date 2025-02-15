@@ -1,4 +1,6 @@
-# printable-paper-templates
+# GridKit
+
+Printable paper templates
  
 ## Inspiration
 
