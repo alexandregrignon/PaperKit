@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Calendrier</title>
+<meta property="og:title" content="Calendrier">
+<meta property="og:url" content="https://alexandregrignon.github.io/calendrier/">
+<meta property="og:description" content="Un calendrier imprimable avec toute l'année sur une seule page">
+<style>
+@import url('https://fonts.bunny.net/css?family=inter:300|oswald:300,400');
+@media print {
+  @page {
+    margin: 0;
+    padding: 1em;
+  }
+  #info {
+    display: none;
+  }
+  td {
+    font-size: 8px !important;
+  }
+  .weekend {
+    background: #d8d8d8 !important;
+  }
+}
+html {
+  font-family: 'Oswald';
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+table {
+  width: 100%;
+  height: calc(100% - 2.5em);
+  border-collapse: separate;
+  border-spacing: .5em 0;
+}
+td, th {
+  text-transform: uppercase;
+  border-bottom: 1px solid #888;
+  padding: .3vmin .3vmin;
+  font-size: .9vmin;
+  font-weight: 300;
+  color: #000;
+}
+th {
+  font-size: 1.1vmin;
+  padding: 0;
+}
+td:empty {
+  border: 0;
+}
+.date {
+  display: inline-block;
+  width: 1.1em;
+}
+.day {
+  display: inline-block;
+  text-align: center;
+  width: 1em;
+  color: #888;
+}
+.weekend {
+  background: #eee;
+  font-weight: 400;
+}
+p {
+  margin: 0 0 .5em 0;
+  text-align: center;
+}
+* {
+  color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+/* Mise à jour des styles de la boîte d'information */
+#info {
+    font-family: 'Inter', sans-serif;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(90vw, 500px);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: linear-gradient(135deg, #333, #111);
+    color: #eee;
+    padding: min(5vw, 1.5em);
+    font-size: clamp(14px, 3vw, 1.2em);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid #444;
+    margin: 0;
+}
+
+#info nav a {
+    font-family: 'Inter', sans-serif;
+    text-align: left;
+    margin-bottom: 1.5em;
+    font-size: 0.8em;
+    color: #aaa;
+    text-decoration: none;
+}
+
+#info nav a:hover {
+    color: #fff;
+}
+
+#info p {
+    text-align: left;
+    margin: 0 0 0.5em 0;
+    line-height: 135%;
+}
+
+#info p a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+#info p a:hover {
+    color: #fff;
+}
+
+/* Mise à jour des styles des options */
+.slider-group {
+    margin-top: min(1em, 3vw);
+}
+
+.slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5em;
+    font-size: clamp(12px, 2.5vw, 1em);
+}
+
+.value {
+    font-size: 0.9em;
+    color: #999;
+}
+
+select {
+    width: 100%;
+    padding: 0.5em;
+    margin: 0.5em 0;
+    border-radius: 0.2em;
+    background: #444;
+    color: #eee;
+    border: 1px solid #555;
+    font-size: 0.9em;
+}
+
+select:focus {
+    outline: none;
+    border-color: #666;
+}
+
+.button-group {
+    display: flex;
+    gap: 1em;
+    margin: 1em 0;
+}
+
+button {
+    flex: 1;
+    padding: 0.5em 1em;
+    border: none;
+    border-radius: 0.2em;
+    background: #444;
+    color: #eee;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9em;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background: #555;
+}
+
+button.active {
+    background: #666;
+}
+
+/* Media query pour les petits écrans */
+@media (max-width: 350px) {
+    #info {
+        padding: 1em;
+    }
+    
+    .slider-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5em;
+    }
+}
+
+/* Ajout pour que la div calendarContainer fasse 100% de la hauteur de l'écran */
+#calendarContainer {
+  height: 100vh;
+}
+
+/* Styles pour les options */
+.slider-group {
+    margin: 1em 0;
+    width: 100%;
+}
+
+.slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5em;
+}
+
+.value {
+    font-size: 0.9em;
+    color: #999;
+}
+
+select {
+    width: 100%;
+    padding: 0.5em;
+    margin: 0.5em 0;
+    border-radius: 0.2em;
+    background: #444;
+    color: #eee;
+    border: 1px solid #555;
+}
+
+select:focus {
+    outline: none;
+    border-color: #666;
+}
+
+option {
+    background: #444;
+    color: #eee;
+}
+
+/* Style des boutons */
+.button-group {
+    display: flex;
+    gap: 1em;
+    margin: 1em 0;
+}
+
+button {
+    flex: 1;
+    padding: 0.5em 1em;
+    border: none;
+    border-radius: 0.2em;
+    background: #444;
+    color: #eee;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+
+button:hover {
+    background: #555;
+}
+
+button.active {
+    background: #666;
+}
+</style>
+</head>
+<body>
+<div id="info">
+    <nav>
+        <a href="index.html">&larr; retour à la liste des templates</a>
+    </nav>
+    <h1>Calendrier</h1>
+    <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> afin d'obtenir un calendrier affichant toutes les dates de l'année sur une seule page. Le format s'adapte automatiquement pour tenir sur un seul format de papier, quelle que soit sa taille. Pour de meilleurs résultats, réglez l'orientation en paysage et désactivez l'en-tête et le pied de page.</p>
+
+    <h2>Options</h2>
+    <div class="slider-group">
+        <div class="slider-header">
+            <label for="year-select">Année</label>
+            <div class="value" id="selectedYear"></div>
+        </div>
+        <select id="year-select">
+            <!-- Les années seront ajoutées via JavaScript -->
+        </select>
+    </div>
+    
+    <div class="button-group">
+        <button id="btn-normal" class="active">Vue standard</button>
+        <button id="btn-aligned">Jours alignés</button>
+    </div>
+
+    <p style="font-size: 80%; color: #999;"><a href="https://github.com/alexandregrignon/calendrier">Source</a> &#183; Adapté en français et en Javascript à partir du projet <a href="https://neatnik.net/dispenser/?project=calendar">Calendar</a> réalisé par <a href="https://neatnik.net/">Neatnik</a></p>
+</div>
+<div id="calendarContainer"></div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const params = new URLSearchParams(window.location.search);
+    const currentYear = new Date().getFullYear();
+    // Par défaut, on utilise l'année en cours
+    let year = params.get('year') ? parseInt(params.get('year')) : currentYear;
+    const layout = params.get('layout');
+    
+    // On supprime la partie avec yearLink qui n'est plus nécessaire
+    
+    // Le reste du code reste inchangé jusqu'aux gestionnaires d'événements
+    
+    // Détermination des jours de week-end (toujours samedi et dimanche)
+    const weekend_day_1 = 6;
+    const weekend_day_2 = 7;
+
+    // Création de l'élément table et de l'en-tête avec les abréviations des mois
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const headerTr = document.createElement("tr");
+    for (let m = 1; m <= 12; m++) {
+        const th = document.createElement("th");
+        const dateObj = new Date(year, m - 1, 1);
+        th.textContent = dateObj.toLocaleString('fr-FR', { month: 'short' }); // modifié en 'fr-FR'
+        headerTr.appendChild(th);
+    }
+    thead.appendChild(headerTr);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+
+    // Pré-calcul des dates pour chaque mois (tableau 1-indexé)
+    const dates = {};
+    for (let m = 1; m <= 12; m++) {
+        dates[m] = [];
+        // Calcul du jour de la semaine du 1er jour du mois (ISO: lundi=1, dimanche=7)
+        const firstDay = new Date(year, m - 1, 1);
+        let firstWeekday = firstDay.getDay();
+        firstWeekday = firstWeekday === 0 ? 7 : firstWeekday;
+        let dayCounter = 1;
+        let flag = false;
+        const daysInMonth = new Date(year, m, 0).getDate();
+        for (let x = 1; x <= 42; x++) {
+            if (!flag) {
+                if (x === firstWeekday) {
+                    dates[m][x] = dayCounter;
+                    dayCounter++;
+                    flag = true;
+                } else {
+                    dates[m][x] = 0;
+                }
+            } else {
+                if (dayCounter > daysInMonth) {
+                    dates[m][x] = 0;
+                } else {
+                    dates[m][x] = dayCounter;
+                    dayCounter++;
+                }
+            }
+        }
+    }
+
+    // Construction des lignes du tableau en fonction du mode de layout
+    if (layout === 'aligned-weekdays') {
+        // Affichage en mode "aligned-weekdays" avec 42 lignes (matrice des dates)
+        for (let day = 1; day <= 42; day++) {
+            const tr = document.createElement("tr");
+            for (let m = 1; m <= 12; m++) {
+                const td = document.createElement("td");
+                const d = dates[m][day];
+                if (d === 0) {
+                    td.textContent = "";
+                } else {
+                    const currentDate = new Date(year, m - 1, d);
+                    // Conversion du jour de la semaine en ISO (dimanche=7)
+                    const isoWeekday = currentDate.getDay() === 0 ? 7 : currentDate.getDay();
+                    if (isoWeekday === weekend_day_1 || isoWeekday === weekend_day_2) {
+                        td.classList.add("weekend");
+                    }
+                    td.textContent = d;
+                }
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        }
+    } else {
+        // Affichage par défaut : une ligne par jour (jusqu'à 31)
+        for (let day = 1; day <= 31; day++) {
+            const tr = document.createElement("tr");
+            for (let m = 1; m <= 12; m++) {
+                const td = document.createElement("td");
+                const daysInMonth = new Date(year, m, 0).getDate();
+                if (day > daysInMonth) {
+                    td.textContent = "";
+                } else {
+                    const currentDate = new Date(year, m - 1, day);
+                    const isoWeekday = currentDate.getDay() === 0 ? 7 : currentDate.getDay();
+                    if (isoWeekday === weekend_day_1 || isoWeekday === weekend_day_2) {
+                        td.classList.add("weekend");
+                    }
+                    const spanDate = document.createElement("span");
+                    spanDate.className = "date";
+                    spanDate.textContent = day;
+                    const spanDay = document.createElement("span");
+                    spanDay.className = "day";
+                    // Première lettre de l'abréviation du jour en français
+                    spanDay.textContent = currentDate.toLocaleString('fr-FR', { weekday: 'short' }).charAt(0); // modifié en 'fr-FR'
+                    td.appendChild(spanDate);
+                    td.appendChild(document.createTextNode(" "));
+                    td.appendChild(spanDay);
+                }
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        }
+    }
+
+    table.appendChild(tbody);
+
+    // Insertion du calendrier dans la page
+    const container = document.getElementById("calendarContainer");
+    const yearP = document.createElement("p");
+    yearP.textContent = year;
+    container.appendChild(yearP);
+    container.appendChild(table);
+
+    // Ajout du sélecteur d'années
+    const yearSelect = document.getElementById("year-select");
+    const yearRange = 10; // Nombre d'années avant et après l'année courante
+    
+    for (let y = currentYear - yearRange; y <= currentYear + yearRange; y++) {
+        const option = document.createElement("option");
+        option.value = y;
+        option.textContent = y;
+        if (y === year) option.selected = true;
+        yearSelect.appendChild(option);
+    }
+
+    // Gestion des boutons de vue
+    const btnNormal = document.getElementById("btn-normal");
+    const btnAligned = document.getElementById("btn-aligned");
+    
+    if (layout === 'aligned-weekdays') {
+        btnNormal.classList.remove("active");
+        btnAligned.classList.add("active");
+    }
+
+    yearSelect.addEventListener("change", function() {
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.set('year', this.value);
+        if (layout) {
+            nextUrl.searchParams.set('layout', layout);
+        }
+        window.location.href = nextUrl.toString();
+    });
+
+    btnNormal.addEventListener("click", function() {
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.set('year', year);
+        nextUrl.searchParams.delete('layout');
+        window.location.href = nextUrl.toString();
+    });
+
+    btnAligned.addEventListener("click", function() {
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.set('year', year);
+        nextUrl.searchParams.set('layout', 'aligned-weekdays');
+        window.location.href = nextUrl.toString();
+    });
+});
+</script>
+</body>
+</html>
