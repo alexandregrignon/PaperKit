@@ -15,10 +15,17 @@
         <h2>Options</h2>
         <div class="slider-group">
             <div class="slider-header">
-                <label for="spacing">Espacement des lignes</label>
+                <label for="spacing">Espacement des lignes principales</label>
                 <div class="value"><span id="spacingValue">5</span> mm</div>
             </div>
             <input type="range" id="spacing" name="spacing" min="1" max="20" value="5">
+        </div>
+        <div class="slider-group">
+            <div class="slider-header">
+                <label for="subdivisions">Subdivisions</label>
+                <div class="value"><span id="subdivisionsValue">1</span></div>
+            </div>
+            <input type="range" id="subdivisions" name="subdivisions" min="1" max="10" value="1">
         </div>
         <div class="slider-group">
             <div class="slider-header">
@@ -43,7 +50,7 @@
             var pageHeight = 297;
             var svg = document.getElementById("grid");
 
-            function createGrid(spacing, pageMargin) {
+            function createGrid(spacing, subdivisions, pageMargin) {
                 // Calcul de la zone effective
                 var effectiveWidth = pageWidth - 2 * pageMargin;
                 var effectiveHeight = pageHeight - 2 * pageMargin;
@@ -60,43 +67,88 @@
                 var marginX = pageMargin + extraMarginX;
                 var marginY = pageMargin + extraMarginY;
 
-                // Création des lignes verticales
+                // Création des groupes pour séparer visuellement les lignes principales et secondaires
+                const mainLines = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                mainLines.setAttribute("stroke", "#bbb");
+                mainLines.setAttribute("stroke-width", "0.2mm");
+
+                const subLines = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                subLines.setAttribute("stroke", "#ddd");
+                subLines.setAttribute("stroke-width", "0.1mm");
+
+                // Lignes verticales
                 for (var i = 0; i < nX; i++) {
                     var x = marginX + i * spacing;
-                    var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                    line.setAttribute("x1", x + "mm");
-                    line.setAttribute("y1", marginY + "mm");
-                    line.setAttribute("x2", x + "mm");
-                    line.setAttribute("y2", (marginY + (nY - 1) * spacing) + "mm");
-                    line.setAttribute("stroke", "#bbb");
-                    line.setAttribute("stroke-width", "0.2mm");
-                    svg.appendChild(line);
+                    
+                    // Ligne principale
+                    var mainLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    mainLine.setAttribute("x1", x + "mm");
+                    mainLine.setAttribute("y1", marginY + "mm");
+                    mainLine.setAttribute("x2", x + "mm");
+                    mainLine.setAttribute("y2", (marginY + (nY - 1) * spacing) + "mm");
+                    mainLines.appendChild(mainLine);
+
+                    // Lignes de subdivision (sauf pour la dernière section)
+                    if (i < nX - 1 && subdivisions > 1) {
+                        const subSpacing = spacing / subdivisions;
+                        for (let s = 1; s < subdivisions; s++) {
+                            const subX = x + s * subSpacing;
+                            const subLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                            subLine.setAttribute("x1", subX + "mm");
+                            subLine.setAttribute("y1", marginY + "mm");
+                            subLine.setAttribute("x2", subX + "mm");
+                            subLine.setAttribute("y2", (marginY + (nY - 1) * spacing) + "mm");
+                            subLines.appendChild(subLine);
+                        }
+                    }
                 }
 
-                // Création des lignes horizontales
+                // Lignes horizontales
                 for (var j = 0; j < nY; j++) {
                     var y = marginY + j * spacing;
-                    var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                    line.setAttribute("x1", marginX + "mm");
-                    line.setAttribute("y1", y + "mm");
-                    line.setAttribute("x2", (marginX + (nX - 1) * spacing) + "mm");
-                    line.setAttribute("y2", y + "mm");
-                    line.setAttribute("stroke", "#bbb");
-                    line.setAttribute("stroke-width", "0.2mm");
-                    svg.appendChild(line);
+                    
+                    // Ligne principale
+                    var mainLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    mainLine.setAttribute("x1", marginX + "mm");
+                    mainLine.setAttribute("y1", y + "mm");
+                    mainLine.setAttribute("x2", (marginX + (nX - 1) * spacing) + "mm");
+                    mainLine.setAttribute("y2", y + "mm");
+                    mainLines.appendChild(mainLine);
+
+                    // Lignes de subdivision (sauf pour la dernière section)
+                    if (j < nY - 1 && subdivisions > 1) {
+                        const subSpacing = spacing / subdivisions;
+                        for (let s = 1; s < subdivisions; s++) {
+                            const subY = y + s * subSpacing;
+                            const subLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                            subLine.setAttribute("x1", marginX + "mm");
+                            subLine.setAttribute("y1", subY + "mm");
+                            subLine.setAttribute("x2", (marginX + (nX - 1) * spacing) + "mm");
+                            subLine.setAttribute("y2", subY + "mm");
+                            subLines.appendChild(subLine);
+                        }
+                    }
                 }
+
+                // Ajout des lignes au SVG (d'abord les subdivisions, puis les lignes principales)
+                svg.appendChild(subLines);
+                svg.appendChild(mainLines);
             }
 
             var spacingSlider = document.getElementById("spacing");
+            var subdivisionsSlider = document.getElementById("subdivisions");
             var marginSlider = document.getElementById("margin");
             var spacingValue = document.getElementById("spacingValue");
+            var subdivisionsValue = document.getElementById("subdivisionsValue");
             var marginValue = document.getElementById("marginValue");
 
             function updateGrid() {
                 var spacing = parseInt(spacingSlider.value);
+                var subdivisions = parseInt(subdivisionsSlider.value);
                 var pageMargin = parseInt(marginSlider.value);
 
                 spacingValue.textContent = spacing;
+                subdivisionsValue.textContent = subdivisions;
                 marginValue.textContent = pageMargin;
 
                 // Clear existing grid
@@ -104,14 +156,15 @@
                     svg.removeChild(svg.firstChild);
                 }
 
-                createGrid(spacing, pageMargin);
+                createGrid(spacing, subdivisions, pageMargin);
             }
 
             spacingSlider.addEventListener("input", updateGrid);
+            subdivisionsSlider.addEventListener("input", updateGrid);
             marginSlider.addEventListener("input", updateGrid);
 
             // Création initiale de la grille
-            createGrid(5, 5);
+            createGrid(5, 1, 5);
         })();
     </script>
 </body>

@@ -12,7 +12,15 @@
         </nav>
         <h1>Réglure Seyès (A4)</h1>
         <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> sur un format de papier A4 pour obtenir un papier Seyès (grands carreaux).</p>
-        <p>Format standard : grille de 21 carreaux x 29 carreaux, soit 609 carreaux complets.</p>
+        <p>Format standard : grille de 21 carreaux x 29 carreaux.</p>
+        <h2>Options</h2>
+        <div class="slider-group">
+            <div class="slider-header">
+                <label for="lineHeight">Hauteur des interlignes</label>
+                <div class="value"><span id="lineHeightValue">2</span> mm</div>
+            </div>
+            <input type="range" id="lineHeight" name="lineHeight" min="2" max="3" step="0.5" value="2">
+        </div>
         <div class="credits">
             Projet <a href="https://github.com/alexandregrignon/GridKit">GridKit</a> par <a href="https://alexandregrignon.fr">Alexandre Grignon</a>
         </div>
@@ -27,16 +35,34 @@
         (function(){
             const pageWidth = 210; // mm
             const pageHeight = 297; // mm
-            const INTERLINE_HEIGHT = 8; // mm
-            const SQUARES_X = 21; // nombre de carreaux à droite du trait rouge
-            const SQUARES_Y = 29; // nombre de carreaux en hauteur
-            const gridWidth = SQUARES_X * INTERLINE_HEIGHT; // 168mm de zone d'écriture
-            const LEFT_MARGIN = pageWidth - gridWidth; // 42mm (espace restant)
+            const MIN_LEFT_MARGIN = 40; // mm (marge gauche minimale)
+            const MIN_VERTICAL_MARGIN = 30; // mm (marges haute et basse minimales)
+            const MAIN_LINE_MULTIPLIER = 4; // nombre d'espacements entre deux lignes principales
             const svg = document.getElementById("grid");
+            const lineHeightSlider = document.getElementById("lineHeight");
+            const lineHeightValue = document.getElementById("lineHeightValue");
 
-            function createGrid() {
-                const gridHeight = SQUARES_Y * INTERLINE_HEIGHT;
-                const marginY = (pageHeight - gridHeight) / 2;
+            function createGrid(smallLineSpacing) {
+                const MAIN_LINE_SPACING = smallLineSpacing * MAIN_LINE_MULTIPLIER;
+
+                // Calcul du nombre maximum de carreaux possibles
+                const availableWidth = pageWidth - MIN_LEFT_MARGIN;
+                const availableHeight = pageHeight - (2 * MIN_VERTICAL_MARGIN);
+                
+                const squaresX = Math.floor(availableWidth / MAIN_LINE_SPACING);
+                const squaresY = Math.floor(availableHeight / MAIN_LINE_SPACING);
+
+                // Calcul des dimensions réelles de la grille
+                const gridWidth = squaresX * MAIN_LINE_SPACING;
+                const gridHeight = squaresY * MAIN_LINE_SPACING;
+
+                // Calcul des marges réelles (centrées)
+                const LEFT_MARGIN = MIN_LEFT_MARGIN;
+                const verticalMargin = (pageHeight - gridHeight) / 2;
+
+                // Mise à jour du texte descriptif
+                document.querySelector('#info p:nth-of-type(2)').textContent = 
+                    `Format : grille de ${squaresX} × ${squaresY} carreaux (${squaresX * squaresY} carreaux au total).`;
 
                 // Nettoyage du SVG
                 while (svg.firstChild) {
@@ -53,34 +79,34 @@
                 subLines.setAttribute("stroke-width", "0.2");
 
                 // Lignes horizontales
-                for (let i = 0; i <= SQUARES_Y; i++) {
-                    const y = marginY + (i * INTERLINE_HEIGHT);
+                for (let i = 0; i <= squaresY; i++) {
+                    const baseY = verticalMargin + (i * MAIN_LINE_SPACING);
                     
-                    // Ligne principale (de 0 jusqu'à la fin de la zone d'écriture)
+                    // Ligne principale (s'étend jusqu'au bord droit)
                     const mainLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
                     mainLine.setAttribute("x1", "0");
-                    mainLine.setAttribute("y1", y + "mm");
-                    mainLine.setAttribute("x2", (LEFT_MARGIN + gridWidth) + "mm");
-                    mainLine.setAttribute("y2", y + "mm");
+                    mainLine.setAttribute("y1", baseY + "mm");
+                    mainLine.setAttribute("x2", pageWidth + "mm");
+                    mainLine.setAttribute("y2", baseY + "mm");
                     mainLines.appendChild(mainLine);
 
-                    if (i < SQUARES_Y) {
-                        // Interlignes (également depuis 0)
-                        [0.25, 0.5, 0.75].forEach(ratio => {
-                            const subY = y + (INTERLINE_HEIGHT * ratio);
+                    if (i < squaresY) {
+                        // Interlignes (s'étendent jusqu'au bord droit)
+                        for (let j = 1; j <= 3; j++) {
+                            const subY = baseY + (j * smallLineSpacing);
                             const subLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
                             subLine.setAttribute("x1", "0");
                             subLine.setAttribute("y1", subY + "mm");
-                            subLine.setAttribute("x2", (LEFT_MARGIN + gridWidth) + "mm");
+                            subLine.setAttribute("x2", pageWidth + "mm");
                             subLine.setAttribute("y2", subY + "mm");
                             subLines.appendChild(subLine);
-                        });
+                        }
                     }
                 }
 
-                // Lignes verticales (de haut en bas de la page)
-                for (let i = 0; i <= SQUARES_X; i++) {
-                    const x = LEFT_MARGIN + (i * INTERLINE_HEIGHT);
+                // Lignes verticales
+                for (let i = 0; i <= squaresX; i++) {
+                    const x = LEFT_MARGIN + (i * MAIN_LINE_SPACING);
                     const vertLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
                     vertLine.setAttribute("x1", x + "mm");
                     vertLine.setAttribute("y1", "0");
@@ -89,7 +115,7 @@
                     subLines.appendChild(vertLine);
                 }
 
-                // Ligne de marge rouge (de haut en bas de la page)
+                // Ligne de marge rouge
                 const marginLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
                 marginLine.setAttribute("x1", LEFT_MARGIN + "mm");
                 marginLine.setAttribute("y1", "0");
@@ -104,8 +130,17 @@
                 svg.appendChild(marginLine);
             }
 
+            function updateGrid() {
+                const smallLineSpacing = parseFloat(lineHeightSlider.value);
+                lineHeightValue.textContent = smallLineSpacing;
+                createGrid(smallLineSpacing);
+            }
+
+            // Event listener pour le slider
+            lineHeightSlider.addEventListener("input", updateGrid);
+
             // Création initiale de la grille
-            createGrid();
+            createGrid(2);
         })();
     </script>
 </body>
