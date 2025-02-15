@@ -9,8 +9,22 @@
     <div id="info">
         <p>Cette page est imprimable sur un format de papier A4 afin d'obtenir une grille de points espacés de 5 mm.</p>
         <p style="font-size: 80%; color: #999;"><a href="https://github.com/alexandregrignon/printable-paper-templates">Source</a></p>
+        <div class="slider-group">
+            <div class="slider-header">
+                <label for="spacing">Espacement des points (mm):</label>
+                <span id="spacingValue">5</span> mm
+            </div>
+            <input type="range" id="spacing" name="spacing" min="1" max="20" value="5">
+        </div>
+        <div class="slider-group">
+            <div class="slider-header">
+                <label for="margin">Largeur de la marge (mm):</label>
+                <span id="marginValue">5</span> mm
+            </div>
+            <input type="range" id="margin" name="margin" min="1" max="20" value="5">
+        </div>
     </div>
-    <nav style="text-align: center; margin-bottom: 1em;">
+    <nav>
         <a href="index.html">&larr; retour à liste des templates</a>
     </nav>
     <div class="paper">
@@ -62,6 +76,53 @@
                     svg.appendChild(circle);
                 }
             }
+
+            var spacingSlider = document.getElementById("spacing");
+            var marginSlider = document.getElementById("margin");
+            var spacingValue = document.getElementById("spacingValue");
+            var marginValue = document.getElementById("marginValue");
+
+            function updateGrid() {
+                var spacing = parseInt(spacingSlider.value);
+                var pageMargin = parseInt(marginSlider.value);
+
+                spacingValue.textContent = spacing;
+                marginValue.textContent = pageMargin;
+
+                // Clear existing grid
+                while (svg.firstChild) {
+                    svg.removeChild(svg.firstChild);
+                }
+
+                // Recalculate effective dimensions and margins
+                var effectiveWidth = pageWidth - 2 * pageMargin;
+                var effectiveHeight = pageHeight - 2 * pageMargin;
+                var nX = Math.floor(effectiveWidth / spacing) + 1;
+                var nY = Math.floor(effectiveHeight / spacing) + 1;
+                var extraMarginX = (effectiveWidth - (nX - 1) * spacing) / 2;
+                var extraMarginY = (effectiveHeight - (nY - 1) * spacing) / 2;
+                var marginX = pageMargin + extraMarginX;
+                var marginY = pageMargin + extraMarginY;
+
+                // Create new grid
+                for (var i = 0; i < nX; i++) {
+                    for (var j = 0; j < nY; j++) {
+                        var cx = marginX + i * spacing;
+                        var cy = marginY + j * spacing;
+                        var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                        circle.setAttribute("cx", cx + "mm");
+                        circle.setAttribute("cy", cy + "mm");
+                        circle.setAttribute("r", "0.25mm");
+                        circle.setAttribute("fill", "#ccc");
+                        svg.appendChild(circle);
+                    }
+                }
+            }
+
+            spacingSlider.addEventListener("input", updateGrid);
+            marginSlider.addEventListener("input", updateGrid);
+
+            updateGrid();
         })();
     </script>
 </body>
