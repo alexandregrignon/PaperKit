@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Graph Paper</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="info">
+        <p>Cette page est imprimable sur un format de papier A4 afin d'obtenir une grille millimétrée avec des lignes espacées de 5 mm.</p>
+        <p style="font-size: 80%; color: #999;"><a href="https://github.com/alexandregrignon/printable-paper-templates">Source</a></p>
+    </div>
+    <nav style="text-align: center; margin-bottom: 1em;">
+        <a href="index.html">&larr; retour à la liste des templates</a>
+    </nav>
+    <div class="paper">
+        <svg id="grid" width="210mm" height="297mm" xmlns="http://www.w3.org/2000/svg">
+            <!-- La grille sera générée par le script -->
+        </svg>
+    </div>
+
+    <script>
+        (function(){
+            // Dimensions de la page A4 en mm
+            var pageWidth = 210;
+            var pageHeight = 297;
+
+            // Marge de 5 mm autour de la page
+            var pageMargin = 5;
+            
+            // Zone effective
+            var effectiveWidth = pageWidth - 2 * pageMargin;
+            var effectiveHeight = pageHeight - 2 * pageMargin;
+
+            // Espacement des lignes en mm
+            var spacing = 5;
+
+            // Calcul du nombre de lignes
+            var nX = Math.floor(effectiveWidth / spacing) + 1;
+            var nY = Math.floor(effectiveHeight / spacing) + 1;
+
+            // Calcul d'une marge additionnelle pour centrer la grille dans la zone effective
+            var extraMarginX = (effectiveWidth - (nX - 1) * spacing) / 2;
+            var extraMarginY = (effectiveHeight - (nY - 1) * spacing) / 2;
+
+            // Position de départ de la grille
+            var marginX = pageMargin + extraMarginX;
+            var marginY = pageMargin + extraMarginY;
+
+            var svg = document.getElementById("grid");
+
+            // Création des lignes verticales
+            for (var i = 0; i < nX; i++) {
+                var x = marginX + i * spacing;
+                var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", x + "mm");
+                line.setAttribute("y1", marginY + "mm");
+                line.setAttribute("x2", x + "mm");
+                line.setAttribute("y2", (marginY + (nY - 1) * spacing) + "mm");
+                line.setAttribute("stroke", "#ccc");
+                line.setAttribute("stroke-width", "0.2mm");
+                svg.appendChild(line);
+            }
+
+            // Création des lignes horizontales
+            for (var j = 0; j < nY; j++) {
+                var y = marginY + j * spacing;
+                var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", marginX + "mm");
+                line.setAttribute("y1", y + "mm");
+                line.setAttribute("x2", (marginX + (nX - 1) * spacing) + "mm");
+                line.setAttribute("y2", y + "mm");
+                line.setAttribute("stroke", "#ccc");
+                line.setAttribute("stroke-width", "0.2mm");
+                svg.appendChild(line);
+            }
+        })();
+    </script>
+</body>
+</html>

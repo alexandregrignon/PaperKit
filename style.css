@@ -1,0 +1,82 @@
+/* Import des polices */
+@import url('https://fonts.bunny.net/css?family=inter:300|oswald:300,400');
+
+/* Configuration des pages pour l'impression */
+@page {
+    size: A4;
+    margin: 0;
+}
+
+/* Styles de base */
+body {
+    margin: 0;
+    padding: 40px;
+    background: #ccc;
+    min-height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* Boîte d'information en surimpression */
+#info {
+    font-family: 'Inter', sans-serif;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    background: #333;
+    color: #eee;
+    padding: 1em;
+    font-size: 1.2em;
+    border-radius: .2em;
+    text-align: center;
+}
+
+#info p {
+    text-align: left;
+    margin: 0 0 0.5em 0;
+    line-height: 135%;
+}
+
+#info a {
+    color: inherit;
+}
+
+/* Style de la navigation */
+nav {
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+    margin-bottom: 1em;
+    width: 100%;
+}
+
+/* Apparence de la feuille simulée (page A4) */
+.paper {
+    width: 210mm;
+    height: 297mm;
+    background: white;
+}
+
+/* Centrage des éléments SVG */
+svg {
+    display: block;
+    margin: auto;
+}
+
+/* Styles appliqués lors de l'impression */
+@media print {
+    body {
+        padding: 0;
+        background: none;
+        display: block;
+    }
+    #info,
+    nav {
+        display: none;
+    }
+}

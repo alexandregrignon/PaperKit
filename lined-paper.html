@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Lined Paper</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="info">
+        <p>Cette page est imprimable sur un format A4 et affiche des lignes horizontales espacées de 10 mm.</p>
+        <p style="font-size: 80%; color: #999;"><a href="https://github.com/alexandregrignon/printable-paper-templates">Source</a></p>
+    </div>
+    <nav style="text-align: center; margin-bottom: 1em;">
+        <a href="index.html">&larr; retour à la liste des templates</a>
+    </nav>
+    <div class="paper">
+        <svg id="grid" width="210mm" height="297mm" xmlns="http://www.w3.org/2000/svg">
+            <!-- Les lignes horizontales seront générées par le script -->
+        </svg>
+    </div>
+
+    <script>
+        (function(){
+            // Dimensions de la page A4 en mm
+            var pageWidth = 210;
+            var pageHeight = 297;
+
+            // Marge de 5 mm tout autour
+            var pageMargin = 5;
+
+            // Zone effective
+            var effectiveWidth = pageWidth - 2 * pageMargin;
+            var effectiveHeight = pageHeight - 2 * pageMargin;
+
+            // Espacement des lignes en mm
+            var spacing = 10;
+
+            // Nombre de lignes horizontales dans la zone effective
+            var nY = Math.floor(effectiveHeight / spacing) + 1;
+
+            // Calcul d'une marge additionnelle pour centrer verticalement les lignes
+            var extraMarginY = (effectiveHeight - (nY - 1) * spacing) / 2;
+            var marginY = pageMargin + extraMarginY;
+
+            var svg = document.getElementById("grid");
+
+            // Création des lignes horizontales
+            for (var j = 0; j < nY; j++) {
+                var y = marginY + j * spacing;
+                var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                // La ligne s'étend sur toute la largeur effective
+                line.setAttribute("x1", pageMargin + "mm");
+                line.setAttribute("y1", y + "mm");
+                line.setAttribute("x2", (pageWidth - pageMargin) + "mm");
+                line.setAttribute("y2", y + "mm");
+                line.setAttribute("stroke", "#ccc");
+                line.setAttribute("stroke-width", "0.2mm");
+                svg.appendChild(line);
+            }
+        })();
+    </script>
+</body>
+</html>

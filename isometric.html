@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Isometric Grid</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="info">
+        <p>Cette page est imprimable sur un format A4 et affiche une grille isométrique avec des lignes verticales et des lignes à ±30° espacées de 5 mm (distance perpendiculaire). Les trois familles se croisent toutes au centre.</p>
+        <p style="font-size: 80%; color: #999;"><a href="https://github.com/alexandregrignon/printable-paper-templates">Source</a></p>
+    </div>
+    <nav style="text-align: center; margin-bottom: 1em;">
+        <a href="index.html">&larr; retour à la liste des templates</a>
+    </nav>
+    <div class="paper">
+        <svg id="grid" width="210mm" height="297mm" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <!-- Définition du clip pour une marge de 5mm tout autour -->
+                <clipPath id="gridClip">
+                    <rect x="5mm" y="5mm" width="200mm" height="287mm"/>
+                </clipPath>
+            </defs>
+            <!-- La grille isométrique sera générée par le script -->
+        </svg>
+    </div>
+
+    <script>
+        (function(){
+            // Paramètres de la page en mm
+            var pageWidth = 210;
+            var pageHeight = 297;
+            var pageMargin = 5;
+
+            // Zone effective délimitée par la marge
+            var left = pageMargin, right = pageWidth - pageMargin;
+            var top = pageMargin, bottom = pageHeight - pageMargin;
+
+            // Centre de la zone effective (point d'intersection commun)
+            var center = {
+                x: (left + right) / 2,
+                y: (top + bottom) / 2
+            };
+
+            // Espacement perpendiculaire entre les lignes en mm
+            var spacing = 5;
+
+            // Longueur suffisante pour tracer des lignes
+            var L = 500;
+
+            // Définition des trois angles en degrés : lignes verticales (90°), et ±30°
+            var angles = [90, 30, -30];
+
+            var svg = document.getElementById("grid");
+
+            // Fonction pour dessiner une famille de lignes à partir d'un angle donné
+            function drawLines(thetaDeg) {
+                var theta = thetaDeg * Math.PI / 180;
+                // Vecteur directeur de la ligne
+                var d = { x: Math.cos(theta), y: Math.sin(theta) };
+                // Vecteur normal (perpendiculaire)
+                var n = { x: -Math.sin(theta), y: Math.cos(theta) };
+
+                // Détermination des offsets maximaux sur la zone effective
+                var corners = [
+                    { x: left, y: top },
+                    { x: right, y: top },
+                    { x: left, y: bottom },
+                    { x: right, y: bottom }
+                ];
+                var offsets = corners.map(function(corner) {
+                    return n.x * (corner.x - center.x) + n.y * (corner.y - center.y);
+                });
+                var maxOffset = Math.max.apply(null, offsets.map(Math.abs));
+
+                // Itération sur les offsets pour tracer les lignes
+                for (var offset = -maxOffset - spacing; offset <= maxOffset + spacing; offset += spacing) {
+                    // Le point de passage est calculé pour que l'offset 0 corresponde au centre
+                    var base = {
+                        x: center.x + n.x * offset,
+                        y: center.y + n.y * offset
+                    };
+                    // Calcul des extrémités de la ligne
+                    var p1 = { x: base.x - L * d.x, y: base.y - L * d.y };
+                    var p2 = { x: base.x + L * d.x, y: base.y + L * d.y };
+
+                    var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", p1.x + "mm");
+                    line.setAttribute("y1", p1.y + "mm");
+                    line.setAttribute("x2", p2.x + "mm");
+                    line.setAttribute("y2", p2.y + "mm");
+                    // Utiliser une teinte légèrement plus claire pour les lignes verticales (90°)
+                    if (thetaDeg === 90) {
+                        line.setAttribute("stroke", "#ddd");
+                    } else {
+                        line.setAttribute("stroke", "#ccc");
+                    }
+                    line.setAttribute("stroke-width", "0.1mm");
+                    // Appliquer le clip pour contraindre l'affichage à la zone effective
+                    line.setAttribute("clip-path", "url(#gridClip)");
+                    svg.appendChild(line);
+                }
+            }
+
+            // Dessiner les trois familles de lignes
+            angles.forEach(function(angle) {
+                drawLines(angle);
+            });
+        })();
+    </script>
+</body>
+</html>

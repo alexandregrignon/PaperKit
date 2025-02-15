@@ -2,81 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Grille de points A4 - Bullet Journal</title>
-    <style>
-        @import url('https://fonts.bunny.net/css?family=inter:300|oswald:300,400');
-        @page {
-            size: A4;
-            margin: 0;
-        }
-        body {
-            margin: 0;
-            padding: 40px; /* espace autour de la page pour voir le fond gris */
-            background: #ccc;
-            min-height: 100vh;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column; /* passage en colonne */
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-        /* Div en surimpression centrée */
-        #info {
-            font-family: 'Inter', sans-serif;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 500px; /* largeur réduite */
-            background: #333;
-            color: #eee;
-            padding: 1em;
-            font-size: 1.5vmax;
-            border-radius: .2em;
-            text-align: center; /* centrer le texte */
-        }
-        #info p {
-            text-align: left;
-            margin: 0 0 0.5em 0;
-            line-height: 135%;
-        }
-        #info a {
-            color: inherit;
-        }
-        /* Style pour la navigation */
-        nav {
-            font-family: 'Inter', sans-serif;
-            text-align: center;
-            margin-bottom: 1em;
-            width: 100%;
-        }
-        /* Conteneur simulant la page A4 */
-        .paper {
-            width: 210mm;
-            height: 297mm;
-            background: white;
-        }
-        /* Centrage de l'élément SVG à l'intérieur de la page */
-        svg {
-            display: block;
-            margin: auto;
-        }
-        /* Styles pour l'impression */
-        @media print {
-            body {
-                padding: 0;
-                background: none;
-                display: block;
-            }
-            #info {
-                display: none;
-            }
-            nav {
-                display: none;
-            }
-        }
-    </style>
+    <title>Dot Grid</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="info">
