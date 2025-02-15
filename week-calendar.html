@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Calendrier hebdomadaire</title>
+<meta property="og:title" content="Calendrier hebdomadaire">
+<meta property="og:description" content="Un calendrier hebdomadaire imprimable">
+<style>
+@import url('https://fonts.bunny.net/css?family=inter:300|oswald:300,400');
+
+@media print {
+  @page {
+    margin: 0;
+    padding: 1em;
+  }
+  #info {
+    display: none;
+  }
+}
+
+html {
+  font-family: 'Oswald';
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Empêche le défilement */
+}
+
+#calendarContainer {
+  height: 100vh; /* Prend toute la hauteur de la fenêtre */
+  padding: 1vmin;
+  box-sizing: border-box;
+}
+
+/* Modifications des styles de la table et des colonnes */
+table {
+  width: 100%;
+  height: calc(100% - 4em); /* Espace pour le titre */
+  border-collapse: collapse;
+  table-layout: fixed; /* Force des largeurs de colonnes constantes */
+}
+
+tbody {
+  height: 100%;
+}
+
+tr {
+  height: calc(100% / 16); /* 16 plages horaires de 7h à 22h */
+}
+
+/* Ajustement des colonnes de jours */
+td, th {
+  width: calc(100% / 7); /* Largeur égale pour toutes les colonnes */
+  min-width: 0;
+  text-transform: uppercase;
+  border-right: 1px solid #888;
+  font-size: 1.2vmin;
+  font-weight: 300;
+  color: #000;
+  height: auto; /* Supprimé la hauteur fixe */
+  vertical-align: top;
+  position: relative; /* Pour le positionnement de l'heure */
+  border-bottom: none; /* Suppression de la bordure par défaut */
+  padding: 0; /* Suppression du padding */
+}
+
+/* Style pour la cellule avec les heures */
+.time-cell {
+  display: grid;
+  grid-template-columns: 3em 1fr;
+  height: 100%;
+  width: 100%;
+}
+
+/* Style pour la colonne des heures */
+.hours-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  background-color: white;
+}
+
+/* Style pour la zone de contenu */
+.content-area {
+  padding: 0.3em;
+  height: 100%;
+}
+
+/* Style pour l'affichage de l'heure */
+td::before {
+  content: attr(data-time);
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  font-size: 0.8vmin;
+  color: #666;
+}
+
+.hour-marker {
+  position: absolute;
+  left: 2px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around; /* Changé de space-between à space-around */
+  align-items: flex-start;
+  font-size: 0.8vmin;
+  color: #666;
+  padding: 0;
+  box-sizing: border-box;
+  width: 3em;
+  z-index: 1; /* Pour s'assurer que le texte reste au-dessus de la ligne */
+}
+
+.hour-time {
+  position: relative;
+  display: block;
+  text-align: left;
+  padding-right: 1em;
+  font-size: 0.8vmin;
+  color: #666;
+  display: block;
+}
+
+.hour-time::after {
+  content: '';
+  position: absolute;
+  left: 3em; /* Espace pour le texte de l'heure */
+  right: -3000px; /* Valeur grande pour s'étendre sur toute la largeur */
+  top: 50%;
+  border-bottom: 1px dotted #ccc;
+  z-index: 0;
+}
+
+.hour-dot {
+  display: block;
+  width: 3px;
+  height: 3px;
+  background-color: #666;
+  border-radius: 50%;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 3px;
+  height: 3px;
+  background-color: #666;
+  border-radius: 50%;
+  margin: 0.2em auto;
+}
+
+td[data-half-hour]::before {
+  content: attr(data-time) "·30";
+}
+
+td:last-child, th:last-child {
+  border-right: none;  /* Supprime la bordure droite du dernier élément */
+}
+
+th {
+  font-size: 1.5vmin;
+  padding: .5vmin;
+  text-align: center;
+}
+
+.date {
+  display: block;
+  font-size: 2vmin;
+  margin-bottom: .5em;
+  text-align: right;
+}
+
+#info {
+    font-family: 'Inter', sans-serif;
+    position: fixed;
+    z-index: 1000;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(90vw, 500px);
+    background: linear-gradient(135deg, #333, #111);
+    color: #eee;
+    padding: min(5vw, 1.5em);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.slider-group {
+    margin: 1em 0;
+}
+
+.slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5em;
+}
+
+select {
+    width: 100%;
+    padding: 0.5em;
+    margin: 0.5em 0;
+    background: #444;
+    color: #eee;
+    border: 1px solid #555;
+}
+
+#info nav a {
+    color: #aaa;
+    text-decoration: none;
+}
+
+#info p {
+    text-align: left;
+    margin: 1em 0;
+}
+
+.header-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2em;
+}
+
+.month-day {
+  font-size: 1vmin;
+  color: #666;
+  font-weight: 300;
+}
+
+.calendar-title {
+  text-align: center;
+  font-size: 2vmin;
+  margin: 1em 0;
+  font-weight: 300;
+  color: #666;
+}
+</style>
+</head>
+<body>
+<div id="info">
+    <nav>
+        <a href="index.html">&larr; retour à la liste des templates</a>
+    </nav>
+    <h1>Calendrier hebdomadaire</h1>
+    <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> pour obtenir un planning hebdomadaire.</p>
+
+    <div class="slider-group">
+        <div class="slider-header">
+            <label for="locale-select">Langue</label>
+        </div>
+        <select id="locale-select">
+            <option value="fr-FR">Français</option>
+            <option value="en-US">English (US)</option>
+            <option value="en-GB">English (UK)</option>
+            <option value="de-DE">Deutsch</option>
+            <option value="es-ES">Español</option>
+        </select>
+    </div>
+
+    <div class="slider-group">
+        <div class="slider-header">
+            <label for="week-select">Semaine</label>
+        </div>
+        <select id="week-select"></select>
+    </div>
+</div>
+
+<div id="calendarContainer"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const params = new URLSearchParams(window.location.search);
+    const today = new Date();
+    
+    const state = {
+        locale: params.get('locale') || 'fr-FR',
+        week: params.get('week') || getWeekNumber(today),
+        year: params.get('year') || today.getFullYear()
+    };
+
+    function getWeekNumber(d) {
+        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+    }
+
+    function getDateOfWeek(w, y) {
+        const simple = new Date(y, 0, 1 + (w - 1) * 7);
+        const dow = simple.getDay();
+        const ISOweekStart = simple;
+        if (dow <= 4)
+            ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+        else
+            ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+        return ISOweekStart;
+    }
+
+    function createWeekCalendar() {
+        const container = document.getElementById('calendarContainer');
+        container.innerHTML = '';
+        
+        const weekStart = getDateOfWeek(state.week, state.year);
+        
+        // Ajout du titre avec l'année et la semaine
+        const title = createElement('h2', {
+            className: 'calendar-title',
+            textContent: `${state.year} - Semaine ${state.week}`
+        });
+        container.appendChild(title);
+        
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        const tbody = document.createElement('tbody');
+        
+        // Création de l'en-tête
+        const headerRow = document.createElement('tr');
+        
+        // Ajout des jours de la semaine avec date
+        for (let i = 0; i < 7; i++) {
+            const currentDate = new Date(weekStart);
+            currentDate.setDate(weekStart.getDate() + i);
+            
+            const th = createElement('th');
+            
+            const headerContent = createElement('div', {
+                className: 'header-date'
+            });
+            
+            // Jour de la semaine et date
+            headerContent.append(
+                createElement('div', {
+                    textContent: currentDate.toLocaleDateString(state.locale, { weekday: 'long' })
+                }),
+                createElement('div', {
+                    className: 'month-day',
+                    textContent: currentDate.toLocaleDateString(state.locale, { 
+                        day: 'numeric',
+                        month: 'long'
+                    })
+                })
+            );
+            
+            th.appendChild(headerContent);
+            headerRow.appendChild(th);
+        }
+        thead.appendChild(headerRow);
+
+        // Création des lignes pour chaque heure
+        for (let hour = 7; hour <= 22; hour++) {
+            const timeRow = createElement('tr');
+            
+            // Cellules pour chaque jour
+            for (let day = 0; day < 7; day++) {
+                const hourCell = createElement('td');
+                const timeCell = createElement('div', { 
+                    className: 'time-cell'
+                });
+
+                // Colonne des heures
+                const hoursColumn = createElement('div', {
+                    className: 'hours-column'
+                });
+
+                // Heure actuelle
+                hoursColumn.appendChild(createElement('span', {
+                    className: 'hour-time',
+                    textContent: `${hour}:00`
+                }));
+
+                // Point (sauf pour la dernière heure)
+                if (hour < 22) {
+                    hoursColumn.appendChild(createElement('span', {
+                        className: 'hour-dot'
+                    }));
+                }
+
+                // Zone de contenu
+                const contentArea = createElement('div', {
+                    className: 'content-area'
+                });
+                
+                timeCell.append(hoursColumn, contentArea);
+                hourCell.appendChild(timeCell);
+                timeRow.appendChild(hourCell);
+            }
+            tbody.appendChild(timeRow);
+        }
+
+        table.append(thead, tbody);
+        container.appendChild(table);
+    }
+
+    function createElement(tag, attrs = {}) {
+        const element = document.createElement(tag);
+        Object.entries(attrs).forEach(([key, value]) => {
+            if (key === 'className') {
+                element.className = value;
+            } else if (key === 'dataset') {
+                Object.entries(value).forEach(([dataKey, dataValue]) => {
+                    element.dataset[dataKey] = dataValue;
+                });
+            } else {
+                element[key] = value;
+            }
+        });
+        return element;
+    }
+
+    function initializeWeekSelect() {
+        const select = document.getElementById('week-select');
+        for (let i = 1; i <= 52; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `Semaine ${i}`;
+            if (i === parseInt(state.week)) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        }
+    }
+
+    function initializeEventListeners() {
+        document.getElementById('locale-select').value = state.locale;
+        document.getElementById('locale-select').addEventListener('change', (e) => {
+            const url = new URL(window.location);
+            url.searchParams.set('locale', e.target.value);
+            window.location = url;
+        });
+
+        document.getElementById('week-select').addEventListener('change', (e) => {
+            const url = new URL(window.location);
+            url.searchParams.set('week', e.target.value);
+            window.location = url;
+        });
+    }
+
+    initializeWeekSelect();
+    initializeEventListeners();
+    createWeekCalendar();
+});
+</script>
+</body>
+</html>

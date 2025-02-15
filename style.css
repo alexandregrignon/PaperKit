@@ -74,6 +74,12 @@ body {
     color: inherit;
 }
 
+#info .credits {
+    font-size: 0.8em;
+    color: #999;
+    margin-top: 2em;
+}
+
 /* Apparence de la feuille simulée (page A4) */
 .paper {
     width: 210mm;
