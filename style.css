@@ -285,6 +285,131 @@ input[type="range"]:focus::-ms-fill-upper {
     user-select: none;
 }
 
+/* Styles pour les options */
+.option-group {
+    margin: 1em 0;
+    width: 100%;
+}
+
+.option-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5em;
+}
+
+.value {
+    font-size: 0.9em;
+    color: #999;
+}
+
+select {
+    width: 100%;
+    padding: 0.5em;
+    margin: 0.5em 0;
+    border-radius: 0.2em;
+    background: #444;
+    color: #eee;
+    border: 1px solid #555;
+}
+
+select:focus {
+    outline: none;
+    border-color: #666;
+}
+
+option {
+    background: #444;
+    color: #eee;
+}
+
+/* Mise à jour des styles des options */
+.option-group {
+    margin-top: min(1em, 3vw);
+}
+
+.option-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5em;
+    font-size: clamp(12px, 2.5vw, 1em);
+}
+
+.value {
+    font-size: 0.9em;
+    color: #999;
+}
+
+select {
+    width: 100%;
+    padding: 0.5em;
+    margin: 0.5em 0;
+    border-radius: 0.2em;
+    background: #444;
+    color: #eee;
+    border: 1px solid #555;
+    font-size: 0.9em;
+}
+
+select:focus {
+    outline: none;
+    border-color: #666;
+}
+
+.button-group {
+    display: flex;
+    gap: 1em;
+    margin: 1em 0;
+}
+
+button {
+    flex: 1;
+    padding: 0.5em 1em;
+    border: none;
+    border-radius: 0.2em;
+    background: #444;
+    color: #eee;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9em;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background: #555;
+}
+
+button.active {
+    background: #666;
+}
+
+/* Style des boutons */
+.button-group {
+    display: flex;
+    gap: 1em;
+    margin: 1em 0;
+}
+
+button {
+    flex: 1;
+    padding: 0.5em 1em;
+    border: none;
+    border-radius: 0.2em;
+    background: #444;
+    color: #eee;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+
+button:hover {
+    background: #555;
+}
+
+button.active {
+    background: #666;
+}
+
 /* Media query pour les très petits écrans */
 @media (max-width: 350px) {
     #info {

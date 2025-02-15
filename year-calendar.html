@@ -6,6 +6,7 @@
 <meta property="og:title" content="Calendrier">
 <meta property="og:url" content="https://alexandregrignon.github.io/calendrier/">
 <meta property="og:description" content="Un calendrier imprimable avec toute l'année sur une seule page">
+<link rel="stylesheet" href="style.css">
 <style>
 @import url('https://fonts.bunny.net/css?family=inter:300|oswald:300,400');
 @media print {
@@ -75,122 +76,13 @@ p {
   -webkit-print-color-adjust: exact;
 }
 
-/* Mise à jour des styles de la boîte d'information */
-#info {
-    font-family: 'Inter', sans-serif;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: min(90vw, 500px);
-    max-height: 90vh;
-    overflow-y: auto;
-    background: linear-gradient(135deg, #333, #111);
-    color: #eee;
-    padding: min(5vw, 1.5em);
-    font-size: clamp(14px, 3vw, 1.2em);
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    border: 1px solid #444;
-    margin: 0;
-}
-
-#info nav a {
-    font-family: 'Inter', sans-serif;
-    text-align: left;
-    margin-bottom: 1.5em;
-    font-size: 0.8em;
-    color: #aaa;
-    text-decoration: none;
-}
-
-#info nav a:hover {
-    color: #fff;
-}
-
-#info p {
-    text-align: left;
-    margin: 0 0 0.5em 0;
-    line-height: 135%;
-}
-
-#info p a {
-    color: inherit;
-    text-decoration: underline;
-}
-
-#info p a:hover {
-    color: #fff;
-}
-
-/* Mise à jour des styles des options */
-.slider-group {
-    margin-top: min(1em, 3vw);
-}
-
-.slider-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5em;
-    font-size: clamp(12px, 2.5vw, 1em);
-}
-
-.value {
-    font-size: 0.9em;
-    color: #999;
-}
-
-select {
-    width: 100%;
-    padding: 0.5em;
-    margin: 0.5em 0;
-    border-radius: 0.2em;
-    background: #444;
-    color: #eee;
-    border: 1px solid #555;
-    font-size: 0.9em;
-}
-
-select:focus {
-    outline: none;
-    border-color: #666;
-}
-
-.button-group {
-    display: flex;
-    gap: 1em;
-    margin: 1em 0;
-}
-
-button {
-    flex: 1;
-    padding: 0.5em 1em;
-    border: none;
-    border-radius: 0.2em;
-    background: #444;
-    color: #eee;
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9em;
-    transition: background 0.2s;
-}
-
-button:hover {
-    background: #555;
-}
-
-button.active {
-    background: #666;
-}
-
 /* Media query pour les petits écrans */
 @media (max-width: 350px) {
     #info {
         padding: 1em;
     }
     
-    .slider-header {
+    .option-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5em;
@@ -200,70 +92,6 @@ button.active {
 /* Ajout pour que la div calendarContainer fasse 100% de la hauteur de l'écran */
 #calendarContainer {
   height: 100vh;
-}
-
-/* Styles pour les options */
-.slider-group {
-    margin: 1em 0;
-    width: 100%;
-}
-
-.slider-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5em;
-}
-
-.value {
-    font-size: 0.9em;
-    color: #999;
-}
-
-select {
-    width: 100%;
-    padding: 0.5em;
-    margin: 0.5em 0;
-    border-radius: 0.2em;
-    background: #444;
-    color: #eee;
-    border: 1px solid #555;
-}
-
-select:focus {
-    outline: none;
-    border-color: #666;
-}
-
-option {
-    background: #444;
-    color: #eee;
-}
-
-/* Style des boutons */
-.button-group {
-    display: flex;
-    gap: 1em;
-    margin: 1em 0;
-}
-
-button {
-    flex: 1;
-    padding: 0.5em 1em;
-    border: none;
-    border-radius: 0.2em;
-    background: #444;
-    color: #eee;
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-}
-
-button:hover {
-    background: #555;
-}
-
-button.active {
-    background: #666;
 }
 </style>
 </head>
@@ -277,8 +105,8 @@ button.active {
 
     <h2>Options</h2>
     <!-- Ajout du sélecteur de langue avant le sélecteur d'année -->
-    <div class="slider-group">
-        <div class="slider-header">
+    <div class="option-group">
+        <div class="option-header">
             <label for="locale-select">Langue</label>
         </div>
         <select id="locale-select">
@@ -295,8 +123,8 @@ button.active {
             <option value="zh-CN">中文</option>
         </select>
     </div>
-    <div class="slider-group">
-        <div class="slider-header">
+    <div class="option-group">
+        <div class="option-header">
             <label for="year-select">Année</label>
             <div class="value" id="selectedYear"></div>
         </div>
@@ -307,7 +135,7 @@ button.active {
     
     <div class="button-group">
         <button id="btn-normal" class="active">Vue standard</button>
-        <button id="btn-aligned">Jours alignés</button>
+        <button id="btn-aligned">Semaines alignées</button>
     </div>
 
     <p style="font-size: 80%; color: #999;">Projet <a href="https://github.com/alexandregrignon/GridKit">GridKit</a> par <a href="https://alexandregrignon.fr">Alexandre Grignon</a> &#183; Le Calendrier est adapté en Javascript à partir du projet <a href="https://neatnik.net/dispenser/?project=calendar">Calendar</a> réalisé par <a href="https://neatnik.net/">Neatnik</a></p>
