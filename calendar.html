@@ -392,7 +392,7 @@ document.addEventListener("DOMContentLoaded", function() {
         );
     }
 
-    // Création d'une cellule de calendrier
+    // Simplification de la fonction createDateCell
     function createDateCell(date, isAligned = false) {
         const isoWeekday = date.getDay() || 7;
         const td = createElement('td', {
@@ -409,20 +409,8 @@ document.addEventListener("DOMContentLoaded", function() {
             textContent: formatDate(date, { weekday: 'short' }).charAt(0)
         });
 
-        // En mode aligné, on affiche seulement le numéro du jour et l'initiale
-        if (isAligned) {
-            td.append(
-                spanDate,
-                ' ',
-                spanDay
-            );
-        } else {
-            td.append(
-                spanDate,
-                ' ',
-                spanDay
-            );
-        }
+        // Toujours afficher le même format
+        td.append(spanDate, ' ', spanDay);
 
         return td;
     }
