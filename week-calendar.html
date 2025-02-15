@@ -5,28 +5,12 @@
 <title>Calendrier hebdomadaire</title>
 <meta property="og:title" content="Calendrier hebdomadaire">
 <meta property="og:description" content="Un calendrier hebdomadaire imprimable">
+<link rel="stylesheet" href="style.css">
 <style>
 @import url('https://fonts.bunny.net/css?family=inter:300|oswald:300,400');
 
-@media print {
-  @page {
-    margin: 0;
-    padding: 1em;
-  }
-  #info {
-    display: none;
-  }
-}
-
 html {
   font-family: 'Oswald';
-}
-
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden; /* Empêche le défilement */
 }
 
 #calendarContainer {
@@ -112,56 +96,6 @@ html, body {
   flex: 1;
 }
 
-/* Suppression des styles non utilisés */
-.row, table, tbody, tr, td, th {
-  display: none;
-}
-
-#info {
-    font-family: 'Inter', sans-serif;
-    position: fixed;
-    z-index: 1000;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: min(90vw, 500px);
-    background: linear-gradient(135deg, #333, #111);
-    color: #eee;
-    padding: min(5vw, 1.5em);
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.slider-group {
-    margin: 1em 0;
-}
-
-.slider-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5em;
-}
-
-select {
-    width: 100%;
-    padding: 0.5em;
-    margin: 0.5em 0;
-    background: #444;
-    color: #eee;
-    border: 1px solid #555;
-}
-
-#info nav a {
-    color: #aaa;
-    text-decoration: none;
-}
-
-#info p {
-    text-align: left;
-    margin: 1em 0;
-}
-
 .header-date {
   display: flex;
   flex-direction: column;
@@ -193,18 +127,6 @@ select {
   display: none;
 }
 
-/* Style pour la nouvelle option */
-.checkbox-group {
-    margin: 1em 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
-}
-
-.checkbox-group input[type="checkbox"] {
-    margin: 0;
-}
-
 </style>
 </head>
 <body>
@@ -216,8 +138,8 @@ select {
     <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> pour obtenir un planning hebdomadaire.</p>
 
     <h2>Options</h2>
-    <div class="slider-group">
-        <div class="slider-header">
+    <div class="option-group">
+        <div class="option-header">
             <label for="locale-select">Langue</label>
         </div>
         <select id="locale-select">
@@ -229,16 +151,19 @@ select {
         </select>
     </div>
 
-    <div class="slider-group">
-        <div class="slider-header">
+    <div class="option-group">
+        <div class="option-header">
             <label for="week-select">Semaine</label>
         </div>
         <select id="week-select"></select>
     </div>
 
-    <div class="checkbox-group">
-        <input type="checkbox" id="hide-weekends" />
-        <label for="hide-weekends">Masquer le week-end</label>
+    <div class="toggle-group">
+        <label class="toggle">
+            <input type="checkbox" id="hide-weekends">
+            <span class="slider"></span>
+            <span class="label">Masquer le week-end</span>
+        </label>
     </div>
 </div>
 
