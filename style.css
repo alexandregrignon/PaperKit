@@ -2,9 +2,10 @@
 @import url('https://fonts.bunny.net/css?family=inter:300|oswald:300,400');
 
 /* Reset & Base */
-body {
+html, body {
     margin: 0;
     padding: 0;
+    height: 100%;
 }
 
 /* Layout de base */
@@ -95,13 +96,22 @@ svg {
 /* Styles appliqués lors de l'impression */
 @media print {
     body {
+        margin: 0;
+        padding: 0;
         background: none;
     }
-    #info,
-    nav {
+    
+    #main {
+        margin: 0;
+        padding: 0;
+        background: none;
+        min-height: auto;
+    }
+    
+    #info {
         display: none;
     }
-}
+    }
 
 /* Styles des inputs range - Consolidation des styles communs */
 input[type="range"] {
