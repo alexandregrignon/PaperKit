@@ -1,0 +1,5 @@
+/* Configuration des pages pour l'impression */
+@page {
+    size: A4;
+    margin: 0;
+}
