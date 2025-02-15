@@ -276,6 +276,25 @@ button.active {
     <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> afin d'obtenir un calendrier affichant toutes les dates de l'année sur une seule page. Le format s'adapte automatiquement pour tenir sur un seul format de papier, quelle que soit sa taille. Pour de meilleurs résultats, réglez l'orientation en paysage et désactivez l'en-tête et le pied de page.</p>
 
     <h2>Options</h2>
+    <!-- Ajout du sélecteur de langue avant le sélecteur d'année -->
+    <div class="slider-group">
+        <div class="slider-header">
+            <label for="locale-select">Langue</label>
+        </div>
+        <select id="locale-select">
+            <option value="fr-FR">Français</option>
+            <option value="en-US">English (US)</option>
+            <option value="en-GB">English (UK)</option>
+            <option value="de-DE">Deutsch</option>
+            <option value="es-ES">Español</option>
+            <option value="it-IT">Italiano</option>
+            <option value="pt-PT">Português</option>
+            <option value="nl-NL">Nederlands</option>
+            <option value="pl-PL">Polski</option>
+            <option value="ja-JP">日本語</option>
+            <option value="zh-CN">中文</option>
+        </select>
+    </div>
     <div class="slider-group">
         <div class="slider-header">
             <label for="year-select">Année</label>
@@ -296,173 +315,211 @@ button.active {
 <div id="calendarContainer"></div>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    // Configuration initiale
     const params = new URLSearchParams(window.location.search);
     const currentYear = new Date().getFullYear();
-    // Par défaut, on utilise l'année en cours
-    let year = params.get('year') ? parseInt(params.get('year')) : currentYear;
-    const layout = params.get('layout');
-    
-    // On supprime la partie avec yearLink qui n'est plus nécessaire
-    
-    // Le reste du code reste inchangé jusqu'aux gestionnaires d'événements
-    
-    // Détermination des jours de week-end (toujours samedi et dimanche)
-    const weekend_day_1 = 6;
-    const weekend_day_2 = 7;
+    const state = {
+        year: params.get('year') ? parseInt(params.get('year')) : currentYear,
+        layout: params.get('layout'),
+        locale: params.get('locale') || 'fr-FR'
+    };
 
-    // Création de l'élément table et de l'en-tête avec les abréviations des mois
-    const table = document.createElement("table");
-    const thead = document.createElement("thead");
-    const headerTr = document.createElement("tr");
-    for (let m = 1; m <= 12; m++) {
-        const th = document.createElement("th");
-        const dateObj = new Date(year, m - 1, 1);
-        th.textContent = dateObj.toLocaleString('fr-FR', { month: 'short' }); // modifié en 'fr-FR'
-        headerTr.appendChild(th);
-    }
-    thead.appendChild(headerTr);
-    table.appendChild(thead);
+    // Initialisation des éléments UI
+    const elements = {
+        localeSelect: document.getElementById("locale-select"),
+        yearSelect: document.getElementById("year-select"),
+        btnNormal: document.getElementById("btn-normal"),
+        btnAligned: document.getElementById("btn-aligned"),
+        container: document.getElementById("calendarContainer")
+    };
 
-    const tbody = document.createElement("tbody");
-
-    // Pré-calcul des dates pour chaque mois (tableau 1-indexé)
-    const dates = {};
-    for (let m = 1; m <= 12; m++) {
-        dates[m] = [];
-        // Calcul du jour de la semaine du 1er jour du mois (ISO: lundi=1, dimanche=7)
-        const firstDay = new Date(year, m - 1, 1);
-        let firstWeekday = firstDay.getDay();
-        firstWeekday = firstWeekday === 0 ? 7 : firstWeekday;
-        let dayCounter = 1;
-        let flag = false;
-        const daysInMonth = new Date(year, m, 0).getDate();
-        for (let x = 1; x <= 42; x++) {
-            if (!flag) {
-                if (x === firstWeekday) {
-                    dates[m][x] = dayCounter;
-                    dayCounter++;
-                    flag = true;
-                } else {
-                    dates[m][x] = 0;
-                }
+    // Fonction utilitaire pour la navigation
+    function navigate(updates = {}) {
+        const nextUrl = new URL(window.location.href);
+        const newState = { ...state, ...updates };
+        
+        Object.entries(newState).forEach(([key, value]) => {
+            if (value && (key !== 'year' || value !== currentYear)) {
+                nextUrl.searchParams.set(key, value);
             } else {
-                if (dayCounter > daysInMonth) {
+                nextUrl.searchParams.delete(key);
+            }
+        });
+        
+        window.location.href = nextUrl.toString();
+    }
+
+    // Fonction pour créer un élément avec des attributs
+    function createElement(tag, attrs = {}, children = []) {
+        const element = document.createElement(tag);
+        Object.entries(attrs).forEach(([key, value]) => {
+            if (value) element[key] = value;
+        });
+        children.forEach(child => element.appendChild(child));
+        return element;
+    }
+
+    // Fonction pour formater une date selon la locale
+    function formatDate(date, options) {
+        try {
+            return date.toLocaleString(state.locale, options);
+        } catch (e) {
+            return date.toLocaleString('fr-FR', options);
+        }
+    }
+
+    // Génération des années dans le select
+    function initializeYearSelect() {
+        const range = [...Array(21)].map((_, i) => currentYear - 10 + i);
+        elements.yearSelect.append(...range.map(y => 
+            createElement('option', {
+                value: y,
+                textContent: y,
+                selected: y === state.year
+            })
+        ));
+    }
+
+    // Création des en-têtes de mois
+    function createMonthHeaders() {
+        return createElement('tr', {}, 
+            Array.from({length: 12}, (_, m) => {
+                const date = new Date(state.year, m, 1);
+                return createElement('th', {
+                    textContent: formatDate(date, { month: 'short' })
+                });
+            })
+        );
+    }
+
+    // Création d'une cellule de calendrier
+    function createDateCell(date, isAligned = false) {
+        const isoWeekday = date.getDay() || 7;
+        const td = createElement('td', {
+            className: isoWeekday > 5 ? 'weekend' : ''
+        });
+
+        const spanDate = createElement('span', {
+            className: 'date',
+            textContent: date.getDate()
+        });
+
+        const spanDay = createElement('span', {
+            className: 'day',
+            textContent: formatDate(date, { weekday: 'short' }).charAt(0)
+        });
+
+        // En mode aligné, on affiche seulement le numéro du jour et l'initiale
+        if (isAligned) {
+            td.append(
+                spanDate,
+                ' ',
+                spanDay
+            );
+        } else {
+            td.append(
+                spanDate,
+                ' ',
+                spanDay
+            );
+        }
+
+        return td;
+    }
+
+    // Création du calendrier
+    function createCalendarTable() {
+        elements.container.innerHTML = '';
+        const yearDisplay = createElement('p', { textContent: state.year });
+        const table = createElement('table');
+        const thead = createElement('thead', {}, [createMonthHeaders()]);
+        const tbody = createElement('tbody');
+
+        // Calcul des dates pour chaque mois
+        const dates = {};
+        for (let m = 1; m <= 12; m++) {
+            dates[m] = [];
+            const firstDay = new Date(state.year, m - 1, 1);
+            let firstWeekday = firstDay.getDay() || 7; // Conversion 0 (dimanche) en 7
+            let dayCounter = 1;
+            const daysInMonth = new Date(state.year, m, 0).getDate();
+
+            // Remplissage du tableau des dates
+            for (let x = 1; x <= 42; x++) {
+                if (x < firstWeekday) {
                     dates[m][x] = 0;
+                } else if (dayCounter <= daysInMonth) {
+                    dates[m][x] = dayCounter++;
                 } else {
-                    dates[m][x] = dayCounter;
-                    dayCounter++;
+                    dates[m][x] = 0;
                 }
             }
         }
-    }
 
-    // Construction des lignes du tableau en fonction du mode de layout
-    if (layout === 'aligned-weekdays') {
-        // Affichage en mode "aligned-weekdays" avec 42 lignes (matrice des dates)
-        for (let day = 1; day <= 42; day++) {
-            const tr = document.createElement("tr");
-            for (let m = 1; m <= 12; m++) {
-                const td = document.createElement("td");
-                const d = dates[m][day];
-                if (d === 0) {
-                    td.textContent = "";
-                } else {
-                    const currentDate = new Date(year, m - 1, d);
-                    // Conversion du jour de la semaine en ISO (dimanche=7)
-                    const isoWeekday = currentDate.getDay() === 0 ? 7 : currentDate.getDay();
-                    if (isoWeekday === weekend_day_1 || isoWeekday === weekend_day_2) {
-                        td.classList.add("weekend");
+        // Création des lignes selon le mode d'affichage
+        if (state.layout === 'aligned-weekdays') {
+            // Vue alignée par jours de la semaine
+            for (let day = 1; day <= 42; day++) {
+                const tr = createElement('tr');
+                for (let m = 1; m <= 12; m++) {
+                    const d = dates[m][day];
+                    if (d === 0) {
+                        tr.appendChild(createElement('td'));
+                    } else {
+                        const date = new Date(state.year, m - 1, d);
+                        tr.appendChild(createDateCell(date, true));
                     }
-                    td.textContent = d;
                 }
-                tr.appendChild(td);
+                if (tr.textContent.trim()) { // N'ajoute que les lignes non vides
+                    tbody.appendChild(tr);
+                }
             }
-            tbody.appendChild(tr);
-        }
-    } else {
-        // Affichage par défaut : une ligne par jour (jusqu'à 31)
-        for (let day = 1; day <= 31; day++) {
-            const tr = document.createElement("tr");
-            for (let m = 1; m <= 12; m++) {
-                const td = document.createElement("td");
-                const daysInMonth = new Date(year, m, 0).getDate();
-                if (day > daysInMonth) {
-                    td.textContent = "";
-                } else {
-                    const currentDate = new Date(year, m - 1, day);
-                    const isoWeekday = currentDate.getDay() === 0 ? 7 : currentDate.getDay();
-                    if (isoWeekday === weekend_day_1 || isoWeekday === weekend_day_2) {
-                        td.classList.add("weekend");
+        } else {
+            // Vue standard (1-31)
+            for (let day = 1; day <= 31; day++) {
+                const tr = createElement('tr');
+                for (let m = 1; m <= 12; m++) {
+                    const daysInMonth = new Date(state.year, m, 0).getDate();
+                    if (day > daysInMonth) {
+                        tr.appendChild(createElement('td'));
+                    } else {
+                        const date = new Date(state.year, m - 1, day);
+                        tr.appendChild(createDateCell(date, false));
                     }
-                    const spanDate = document.createElement("span");
-                    spanDate.className = "date";
-                    spanDate.textContent = day;
-                    const spanDay = document.createElement("span");
-                    spanDay.className = "day";
-                    // Première lettre de l'abréviation du jour en français
-                    spanDay.textContent = currentDate.toLocaleString('fr-FR', { weekday: 'short' }).charAt(0); // modifié en 'fr-FR'
-                    td.appendChild(spanDate);
-                    td.appendChild(document.createTextNode(" "));
-                    td.appendChild(spanDay);
                 }
-                tr.appendChild(td);
+                tbody.appendChild(tr);
             }
-            tbody.appendChild(tr);
         }
+
+        table.append(thead, tbody);
+        elements.container.append(yearDisplay, table);
     }
 
-    table.appendChild(tbody);
+    // Initialisation des gestionnaires d'événements
+    function initializeEventListeners() {
+        elements.localeSelect.value = state.locale;
+        elements.localeSelect.addEventListener('change', e => 
+            navigate({ locale: e.target.value }));
 
-    // Insertion du calendrier dans la page
-    const container = document.getElementById("calendarContainer");
-    const yearP = document.createElement("p");
-    yearP.textContent = year;
-    container.appendChild(yearP);
-    container.appendChild(table);
+        elements.yearSelect.addEventListener('change', e => 
+            navigate({ year: parseInt(e.target.value) }));
 
-    // Ajout du sélecteur d'années
-    const yearSelect = document.getElementById("year-select");
-    const yearRange = 10; // Nombre d'années avant et après l'année courante
-    
-    for (let y = currentYear - yearRange; y <= currentYear + yearRange; y++) {
-        const option = document.createElement("option");
-        option.value = y;
-        option.textContent = y;
-        if (y === year) option.selected = true;
-        yearSelect.appendChild(option);
-    }
-
-    // Gestion des boutons de vue
-    const btnNormal = document.getElementById("btn-normal");
-    const btnAligned = document.getElementById("btn-aligned");
-    
-    if (layout === 'aligned-weekdays') {
-        btnNormal.classList.remove("active");
-        btnAligned.classList.add("active");
-    }
-
-    yearSelect.addEventListener("change", function() {
-        const nextUrl = new URL(window.location.href);
-        nextUrl.searchParams.set('year', this.value);
-        if (layout) {
-            nextUrl.searchParams.set('layout', layout);
+        if (state.layout === 'aligned-weekdays') {
+            elements.btnNormal.classList.remove('active');
+            elements.btnAligned.classList.add('active');
         }
-        window.location.href = nextUrl.toString();
-    });
 
-    btnNormal.addEventListener("click", function() {
-        const nextUrl = new URL(window.location.href);
-        nextUrl.searchParams.set('year', year);
-        nextUrl.searchParams.delete('layout');
-        window.location.href = nextUrl.toString();
-    });
+        elements.btnNormal.addEventListener('click', () => 
+            navigate({ layout: null }));
+        
+        elements.btnAligned.addEventListener('click', () => 
+            navigate({ layout: 'aligned-weekdays' }));
+    }
 
-    btnAligned.addEventListener("click", function() {
-        const nextUrl = new URL(window.location.href);
-        nextUrl.searchParams.set('year', year);
-        nextUrl.searchParams.set('layout', 'aligned-weekdays');
-        window.location.href = nextUrl.toString();
-    });
+    // Initialisation
+    initializeYearSelect();
+    initializeEventListeners();
+    createCalendarTable();
 });
 </script>
 </body>
