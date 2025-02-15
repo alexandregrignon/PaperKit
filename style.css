@@ -28,16 +28,32 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 500px;
-    background: linear-gradient(135deg, #333, #111); /* fond sombre */
-    color: #eee; /* couleur du texte pour meilleur contraste */
-    padding: 1em 1.5em;
-    font-size: 1.2em;
+    width: min(90vw, 500px); /* largeur responsive */
+    max-height: 90vh; /* hauteur max responsive */
+    overflow-y: auto; /* scroll si contenu trop long */
+    background: linear-gradient(135deg, #333, #111);
+    color: #eee;
+    padding: min(5vw, 1.5em); /* padding responsive */
+    font-size: clamp(14px, 3vw, 1.2em); /* taille de police responsive */
     border-radius: 10px;
-    text-align: center;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     border: 1px solid #444;
 }
+
+/* Style de la navigation */
+#info nav a {
+    font-family: 'Inter', sans-serif;
+    text-align: left;
+    margin-bottom: 1.5em;
+    font-size: 0.8em;
+    color: #aaaaaa;
+    text-decoration: none;
+}
+
+#info nav a:hover {
+    color: #fff;
+}
+
 
 #info p {
     text-align: left;
@@ -45,16 +61,17 @@ body {
     line-height: 135%;
 }
 
-#info a {
+#info p a {
     color: inherit;
+    text-decoration: underline;
 }
 
-/* Style de la navigation */
-nav {
-    font-family: 'Inter', sans-serif;
-    text-align: center;
-    margin-bottom: 1em;
-    width: 100%;
+#info p a:hover {
+    color: #fff;
+}
+
+#info a {
+    color: inherit;
 }
 
 /* Apparence de la feuille simulée (page A4) */
@@ -96,7 +113,7 @@ input[type="range"]:focus {
 
 input[type="range"]::-webkit-slider-runnable-track {
     width: 100%;
-    height: 8.4px;
+    height: 4px; /* Réduit de 8.4px à 4px */
     cursor: pointer;
     background: linear-gradient(90deg, #555, #777);
     border-radius: 5px;
@@ -111,7 +128,7 @@ input[type="range"]::-webkit-slider-thumb {
     background: #eee;
     cursor: pointer;
     -webkit-appearance: none;
-    margin-top: -6px;
+    margin-top: -8px; /* Ajusté pour la nouvelle hauteur de piste */
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
@@ -121,7 +138,7 @@ input[type="range"]:focus::-webkit-slider-runnable-track {
 
 input[type="range"]::-moz-range-track {
     width: 100%;
-    height: 8.4px;
+    height: 4px; /* Réduit de 8.4px à 4px */
     cursor: pointer;
     background: linear-gradient(90deg, #555, #777);
     border-radius: 5px;
@@ -140,7 +157,7 @@ input[type="range"]::-moz-range-thumb {
 
 input[type="range"]::-ms-track {
     width: 100%;
-    height: 8.4px;
+    height: 4px; /* Réduit de 8.4px à 4px */
     cursor: pointer;
     background: transparent;
     border-color: transparent;
@@ -179,7 +196,7 @@ input[type="range"]:focus::-ms-fill-upper {
 
 /* Nouveau style pour organiser les sliders */
 .slider-group {
-    margin-top: 1em;
+    margin-top: min(1em, 3vw);
 }
 
 /* Nouveau style pour organiser les sliders sur deux lignes */
@@ -188,10 +205,33 @@ input[type="range"]:focus::-ms-fill-upper {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.5em;
+    font-size: clamp(12px, 2.5vw, 1em);
+}
+
+.slider-header .label {
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.slider-header .value {
+    font-size: 0.8em;
 }
 
 .slider-wrapper {
     display: inline-flex;
     align-items: center;
     gap: 0.5em;
+}
+
+/* Media query pour les très petits écrans */
+@media (max-width: 350px) {
+    #info {
+        padding: 1em;
+    }
+    
+    .slider-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5em;
+    }
 }

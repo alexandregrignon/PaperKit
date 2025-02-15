@@ -7,26 +7,28 @@
 </head>
 <body>
     <div id="info">
-        <p>Cette page est imprimable sur un format de papier A4 afin d'obtenir une grille de points espacés de 5 mm.</p>
+        <nav>
+            <a href="index.html">&larr; retour à la liste des templates</a>
+        </nav>
+        <h1>Dot Grid (A4)</h1>
+        <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> sur un format de papier A4 afin d'obtenir une grille de points à la manière d'une trame de Bullet Journal.</p>
         <p style="font-size: 80%; color: #999;"><a href="https://github.com/alexandregrignon/printable-paper-templates">Source</a></p>
+        <h2>Options</h2>
         <div class="slider-group">
             <div class="slider-header">
-                <label for="spacing">Espacement des points (mm):</label>
-                <span id="spacingValue">5</span> mm
+                <label for="spacing">Espacement des points</label>
+                <div class="value"><span id="spacingValue">5</span> mm</div>
             </div>
             <input type="range" id="spacing" name="spacing" min="1" max="20" value="5">
         </div>
         <div class="slider-group">
             <div class="slider-header">
-                <label for="margin">Largeur de la marge (mm):</label>
-                <span id="marginValue">5</span> mm
+                <label for="margin">Largeur de la marge</label>
+                <div class="value"><span id="marginValue">5</span> mm</div>
             </div>
             <input type="range" id="margin" name="margin" min="1" max="20" value="5">
         </div>
     </div>
-    <nav>
-        <a href="index.html">&larr; retour à liste des templates</a>
-    </nav>
     <div class="paper">
         <svg id="grid" width="210mm" height="297mm" xmlns="http://www.w3.org/2000/svg">
             <!-- La grille de points sera générée par le script -->
@@ -38,42 +40,37 @@
             // Dimensions de la page A4 en mm
             var pageWidth = 210;
             var pageHeight = 297;
-
-            // Marge de 5mm tout autour
-            var pageMargin = 5;
-            
-            // Calcul de la zone effective
-            var effectiveWidth = pageWidth - 2 * pageMargin;
-            var effectiveHeight = pageHeight - 2 * pageMargin;
-
-            // Espacement des points en mm
-            var spacing = 5;
-
-            // Calcul du nombre de points pour chaque axe dans la zone effective
-            var nX = Math.floor(effectiveWidth / spacing) + 1;
-            var nY = Math.floor(effectiveHeight / spacing) + 1;
-
-            // Calcul de marge additionnelle pour centrer la grille
-            var extraMarginX = (effectiveWidth - (nX - 1) * spacing) / 2;
-            var extraMarginY = (effectiveHeight - (nY - 1) * spacing) / 2;
-
-            // La marge totale à appliquer depuis le bord de la page
-            var marginX = pageMargin + extraMarginX;
-            var marginY = pageMargin + extraMarginY;
-
             var svg = document.getElementById("grid");
 
-            // Création d'un point (cercle) discret : petit rayon et couleur grise
-            for (var i = 0; i < nX; i++) {
-                for (var j = 0; j < nY; j++) {
-                    var cx = marginX + i * spacing;
-                    var cy = marginY + j * spacing;
-                    var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                    circle.setAttribute("cx", cx + "mm");
-                    circle.setAttribute("cy", cy + "mm");
-                    circle.setAttribute("r", "0.25mm");
-                    circle.setAttribute("fill", "#ccc");
-                    svg.appendChild(circle);
+            function createGrid(spacing, pageMargin) {
+                // Calcul de la zone effective
+                var effectiveWidth = pageWidth - 2 * pageMargin;
+                var effectiveHeight = pageHeight - 2 * pageMargin;
+
+                // Calcul du nombre de points pour chaque axe dans la zone effective
+                var nX = Math.floor(effectiveWidth / spacing) + 1;
+                var nY = Math.floor(effectiveHeight / spacing) + 1;
+
+                // Calcul de marge additionnelle pour centrer la grille
+                var extraMarginX = (effectiveWidth - (nX - 1) * spacing) / 2;
+                var extraMarginY = (effectiveHeight - (nY - 1) * spacing) / 2;
+
+                // La marge totale à appliquer depuis le bord de la page
+                var marginX = pageMargin + extraMarginX;
+                var marginY = pageMargin + extraMarginY;
+
+                // Création des points
+                for (var i = 0; i < nX; i++) {
+                    for (var j = 0; j < nY; j++) {
+                        var cx = marginX + i * spacing;
+                        var cy = marginY + j * spacing;
+                        var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                        circle.setAttribute("cx", cx + "mm");
+                        circle.setAttribute("cy", cy + "mm");
+                        circle.setAttribute("r", "0.25mm");
+                        circle.setAttribute("fill", "#bbb");
+                        svg.appendChild(circle);
+                    }
                 }
             }
 
@@ -94,35 +91,14 @@
                     svg.removeChild(svg.firstChild);
                 }
 
-                // Recalculate effective dimensions and margins
-                var effectiveWidth = pageWidth - 2 * pageMargin;
-                var effectiveHeight = pageHeight - 2 * pageMargin;
-                var nX = Math.floor(effectiveWidth / spacing) + 1;
-                var nY = Math.floor(effectiveHeight / spacing) + 1;
-                var extraMarginX = (effectiveWidth - (nX - 1) * spacing) / 2;
-                var extraMarginY = (effectiveHeight - (nY - 1) * spacing) / 2;
-                var marginX = pageMargin + extraMarginX;
-                var marginY = pageMargin + extraMarginY;
-
-                // Create new grid
-                for (var i = 0; i < nX; i++) {
-                    for (var j = 0; j < nY; j++) {
-                        var cx = marginX + i * spacing;
-                        var cy = marginY + j * spacing;
-                        var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                        circle.setAttribute("cx", cx + "mm");
-                        circle.setAttribute("cy", cy + "mm");
-                        circle.setAttribute("r", "0.25mm");
-                        circle.setAttribute("fill", "#ccc");
-                        svg.appendChild(circle);
-                    }
-                }
+                createGrid(spacing, pageMargin);
             }
 
             spacingSlider.addEventListener("input", updateGrid);
             marginSlider.addEventListener("input", updateGrid);
 
-            updateGrid();
+            // Création initiale de la grille
+            createGrid(5, 5);
         })();
     </script>
 </body>

@@ -7,105 +7,137 @@
 </head>
 <body>
     <div id="info">
-        <p>Cette page est imprimable sur un format A4 et affiche une grille isométrique avec des lignes verticales et des lignes à ±30° espacées de 5 mm (distance perpendiculaire). Les trois familles se croisent toutes au centre.</p>
+        <nav>
+            <a href="index.html">&larr; retour à la liste des templates</a>
+        </nav>
+        <h1>Isometric Grid (A4)</h1>
+        <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> sur un format de papier A4 afin d'obtenir une grille isométrique avec des lignes verticales et des lignes à ±30°.</p>
         <p style="font-size: 80%; color: #999;"><a href="https://github.com/alexandregrignon/printable-paper-templates">Source</a></p>
+        <h2>Options</h2>
+        <div class="slider-group">
+            <div class="slider-header">
+                <label for="spacing">Espacement des lignes</label>
+                <div class="value"><span id="spacingValue">5</span> mm</div>
+            </div>
+            <input type="range" id="spacing" name="spacing" min="2" max="20" value="5">
+        </div>
+        <div class="slider-group">
+            <div class="slider-header">
+                <label for="margin">Largeur de la marge</label>
+                <div class="value"><span id="marginValue">5</span> mm</div>
+            </div>
+            <input type="range" id="margin" name="margin" min="1" max="20" value="5">
+        </div>
     </div>
-    <nav>
-        <a href="index.html">&larr; retour à la liste des templates</a>
-    </nav>
     <div class="paper">
         <svg id="grid" width="210mm" height="297mm" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <!-- Définition du clip pour une marge de 5mm tout autour -->
-                <clipPath id="gridClip">
-                    <rect x="5mm" y="5mm" width="200mm" height="287mm"/>
-                </clipPath>
-            </defs>
             <!-- La grille isométrique sera générée par le script -->
         </svg>
     </div>
 
     <script>
         (function(){
-            // Paramètres de la page en mm
             var pageWidth = 210;
             var pageHeight = 297;
-            var pageMargin = 5;
-
-            // Zone effective délimitée par la marge
-            var left = pageMargin, right = pageWidth - pageMargin;
-            var top = pageMargin, bottom = pageHeight - pageMargin;
-
-            // Centre de la zone effective (point d'intersection commun)
-            var center = {
-                x: (left + right) / 2,
-                y: (top + bottom) / 2
-            };
-
-            // Espacement perpendiculaire entre les lignes en mm
-            var spacing = 5;
-
-            // Longueur suffisante pour tracer des lignes
-            var L = 500;
-
-            // Définition des trois angles en degrés : lignes verticales (90°), et ±30°
+            var svg = document.getElementById("grid");
             var angles = [90, 30, -30];
 
-            var svg = document.getElementById("grid");
+            function createGrid(spacing, pageMargin) {
+                // Définition du clip pour la marge
+                svg.innerHTML = `
+                    <defs>
+                        <clipPath id="gridClip">
+                            <rect x="${pageMargin}mm" y="${pageMargin}mm" 
+                                  width="${pageWidth - 2*pageMargin}mm" height="${pageHeight - 2*pageMargin}mm"/>
+                        </clipPath>
+                    </defs>
+                `;
 
-            // Fonction pour dessiner une famille de lignes à partir d'un angle donné
-            function drawLines(thetaDeg) {
-                var theta = thetaDeg * Math.PI / 180;
-                // Vecteur directeur de la ligne
-                var d = { x: Math.cos(theta), y: Math.sin(theta) };
-                // Vecteur normal (perpendiculaire)
-                var n = { x: -Math.sin(theta), y: Math.cos(theta) };
+                // Zone effective délimitée par la marge
+                var left = pageMargin, right = pageWidth - pageMargin;
+                var top = pageMargin, bottom = pageHeight - pageMargin;
 
-                // Détermination des offsets maximaux sur la zone effective
-                var corners = [
-                    { x: left, y: top },
-                    { x: right, y: top },
-                    { x: left, y: bottom },
-                    { x: right, y: bottom }
-                ];
-                var offsets = corners.map(function(corner) {
-                    return n.x * (corner.x - center.x) + n.y * (corner.y - center.y);
-                });
-                var maxOffset = Math.max.apply(null, offsets.map(Math.abs));
+                // Centre exact de la page (point d'intersection commun)
+                var center = {
+                    x: pageWidth / 2,
+                    y: pageHeight / 2
+                };
 
-                // Itération sur les offsets pour tracer les lignes
-                for (var offset = -maxOffset - spacing; offset <= maxOffset + spacing; offset += spacing) {
-                    // Le point de passage est calculé pour que l'offset 0 corresponde au centre
-                    var base = {
-                        x: center.x + n.x * offset,
-                        y: center.y + n.y * offset
-                    };
-                    // Calcul des extrémités de la ligne
-                    var p1 = { x: base.x - L * d.x, y: base.y - L * d.y };
-                    var p2 = { x: base.x + L * d.x, y: base.y + L * d.y };
+                // Longueur suffisante pour tracer des lignes
+                var L = 500;
 
-                    var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                    line.setAttribute("x1", p1.x + "mm");
-                    line.setAttribute("y1", p1.y + "mm");
-                    line.setAttribute("x2", p2.x + "mm");
-                    line.setAttribute("y2", p2.y + "mm");
-                    // Utiliser une teinte légèrement plus claire pour les lignes verticales (90°)
-                    if (thetaDeg === 90) {
-                        line.setAttribute("stroke", "#ddd");
-                    } else {
-                        line.setAttribute("stroke", "#ccc");
+                function drawLines(thetaDeg) {
+                    var theta = thetaDeg * Math.PI / 180;
+                    var d = { x: Math.cos(theta), y: Math.sin(theta) };
+                    var n = { x: -Math.sin(theta), y: Math.cos(theta) };
+
+                    // Calcul des offsets pour que le centre soit toujours sur une ligne
+                    var baseOffset = n.x * center.x + n.y * center.y;
+                    var normalizedOffset = Math.round(baseOffset / spacing) * spacing;
+                    
+                    // Calcul des limites pour couvrir toute la zone
+                    var corners = [
+                        { x: left, y: top },
+                        { x: right, y: top },
+                        { x: left, y: bottom },
+                        { x: right, y: bottom }
+                    ];
+                    var offsets = corners.map(function(corner) {
+                        return n.x * corner.x + n.y * corner.y;
+                    });
+                    var minOffset = Math.min.apply(null, offsets);
+                    var maxOffset = Math.max.apply(null, offsets);
+
+                    // Ajustement des offsets pour commencer sur un multiple de l'espacement
+                    var startOffset = Math.floor(minOffset / spacing) * spacing;
+                    var endOffset = Math.ceil(maxOffset / spacing) * spacing;
+
+                    for (var offset = startOffset; offset <= endOffset; offset += spacing) {
+                        var base = {
+                            x: center.x + (offset - normalizedOffset) * n.x,
+                            y: center.y + (offset - normalizedOffset) * n.y
+                        };
+                        var p1 = { x: base.x - L * d.x, y: base.y - L * d.y };
+                        var p2 = { x: base.x + L * d.x, y: base.y + L * d.y };
+
+                        var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                        line.setAttribute("x1", p1.x + "mm");
+                        line.setAttribute("y1", p1.y + "mm");
+                        line.setAttribute("x2", p2.x + "mm");
+                        line.setAttribute("y2", p2.y + "mm");
+                        line.setAttribute("stroke", thetaDeg === 90 ? "#ddd" : "#bbb"); // Lignes verticales plus claires
+                        line.setAttribute("stroke-width", "0.1mm");
+                        line.setAttribute("clip-path", "url(#gridClip)");
+                        svg.appendChild(line);
                     }
-                    line.setAttribute("stroke-width", "0.1mm");
-                    // Appliquer le clip pour contraindre l'affichage à la zone effective
-                    line.setAttribute("clip-path", "url(#gridClip)");
-                    svg.appendChild(line);
                 }
+
+                // Dessiner les trois familles de lignes
+                angles.forEach(drawLines);
             }
 
-            // Dessiner les trois familles de lignes
-            angles.forEach(function(angle) {
-                drawLines(angle);
-            });
+            var spacingSlider = document.getElementById("spacing");
+            var marginSlider = document.getElementById("margin");
+            var spacingValue = document.getElementById("spacingValue");
+            var marginValue = document.getElementById("marginValue");
+
+            function updateGrid() {
+                var spacing = parseInt(spacingSlider.value);
+                var pageMargin = parseInt(marginSlider.value);
+
+                spacingValue.textContent = spacing;
+                marginValue.textContent = pageMargin;
+
+                // Clear existing grid
+                svg.innerHTML = '';
+                createGrid(spacing, pageMargin);
+            }
+
+            spacingSlider.addEventListener("input", updateGrid);
+            marginSlider.addEventListener("input", updateGrid);
+
+            // Création initiale de la grille
+            createGrid(5, 5);
         })();
     </script>
 </body>
