@@ -6,35 +6,37 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="info">
-        <nav>
-            <a href="index.html">&larr; retour à la liste des templates</a>
-        </nav>
-        <h1>Isometric Grid (A4)</h1>
-        <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> sur un format de papier A4 afin d'obtenir une grille isométrique avec des lignes verticales et des lignes à ±30°.</p>
-        <h2>Options</h2>
-        <div class="slider-group">
-            <div class="slider-header">
-                <label for="spacing">Espacement des lignes</label>
-                <div class="value"><span id="spacingValue">5</span> mm</div>
+    <div id="main">
+        <div id="info">
+            <nav>
+                <a href="index.html">&larr; retour à la liste des templates</a>
+            </nav>
+            <h1>Isometric Grid (A4)</h1>
+            <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> sur un format de papier A4 afin d'obtenir une grille isométrique avec des lignes verticales et des lignes à ±30°.</p>
+            <h2>Options</h2>
+            <div class="slider-group">
+                <div class="slider-header">
+                    <label for="spacing">Espacement des lignes</label>
+                    <div class="value"><span id="spacingValue">5</span> mm</div>
+                </div>
+                <input type="range" id="spacing" name="spacing" min="2" max="20" value="5">
             </div>
-            <input type="range" id="spacing" name="spacing" min="2" max="20" value="5">
-        </div>
-        <div class="slider-group">
-            <div class="slider-header">
-                <label for="margin">Largeur de la marge</label>
-                <div class="value"><span id="marginValue">5</span> mm</div>
+            <div class="slider-group">
+                <div class="slider-header">
+                    <label for="margin">Largeur de la marge</label>
+                    <div class="value"><span id="marginValue">5</span> mm</div>
+                </div>
+                <input type="range" id="margin" name="margin" min="1" max="20" value="5">
             </div>
-            <input type="range" id="margin" name="margin" min="1" max="20" value="5">
+            <div class="credits">
+                Projet <a href="https://github.com/alexandregrignon/GridKit">GridKit</a> par <a href="https://alexandregrignon.fr">Alexandre Grignon</a>
+            </div>
         </div>
-        <div class="credits">
-            Projet <a href="https://github.com/alexandregrignon/GridKit">GridKit</a> par <a href="https://alexandregrignon.fr">Alexandre Grignon</a>
+        <div class="paper">
+            <svg id="grid" width="210mm" height="297mm" xmlns="http://www.w3.org/2000/svg">
+                <!-- La grille isométrique sera générée par le script -->
+            </svg>
         </div>
-    </div>
-    <div class="paper">
-        <svg id="grid" width="210mm" height="297mm" xmlns="http://www.w3.org/2000/svg">
-            <!-- La grille isométrique sera générée par le script -->
-        </svg>
     </div>
 
     <script>

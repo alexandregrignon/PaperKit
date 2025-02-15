@@ -124,11 +124,11 @@ p {
 }
 
 /* Mise à jour des styles des options */
-.option-group {
+.slider-group {
     margin-top: min(1em, 3vw);
 }
 
-.option-header {
+.slider-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -190,7 +190,7 @@ button.active {
         padding: 1em;
     }
     
-    .option-header {
+    .slider-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5em;
@@ -203,12 +203,12 @@ button.active {
 }
 
 /* Styles pour les options */
-.option-group {
+.slider-group {
     margin: 1em 0;
     width: 100%;
 }
 
-.option-header {
+.slider-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -277,8 +277,8 @@ button.active {
 
     <h2>Options</h2>
     <!-- Ajout du sélecteur de langue avant le sélecteur d'année -->
-    <div class="option-group">
-        <div class="option-header">
+    <div class="slider-group">
+        <div class="slider-header">
             <label for="locale-select">Langue</label>
         </div>
         <select id="locale-select">
@@ -295,8 +295,8 @@ button.active {
             <option value="zh-CN">中文</option>
         </select>
     </div>
-    <div class="option-group">
-        <div class="option-header">
+    <div class="slider-group">
+        <div class="slider-header">
             <label for="year-select">Année</label>
             <div class="value" id="selectedYear"></div>
         </div>
