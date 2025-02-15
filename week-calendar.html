@@ -35,144 +35,86 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Modifications des styles de la table et des colonnes */
-table {
+/* Nouvelle structure Flexbox pour le calendrier */
+.calendar {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 4em);
   width: 100%;
-  height: calc(100% - 4em); /* Espace pour le titre */
-  border-collapse: collapse;
-  table-layout: fixed; /* Force des largeurs de colonnes constantes */
 }
 
-tbody {
-  height: 100%;
+.calendar-content {
+  display: flex;
+  flex: 1;
+  width: 100%;
 }
 
-tr {
-  height: calc(100% / 16); /* 16 plages horaires de 7h à 22h */
-}
-
-/* Ajustement des colonnes de jours */
-td, th {
-  width: calc(100% / 7); /* Largeur égale pour toutes les colonnes */
-  min-width: 0;
-  text-transform: uppercase;
+.day-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   border-right: 1px solid #888;
-  font-size: 1.2vmin;
-  font-weight: 300;
-  color: #000;
-  height: auto; /* Supprimé la hauteur fixe */
-  vertical-align: top;
-  position: relative; /* Pour le positionnement de l'heure */
-  border-bottom: none; /* Suppression de la bordure par défaut */
-  padding: 0; /* Suppression du padding */
+  min-width: 0;
 }
 
-/* Style pour la cellule avec les heures */
-.time-cell {
-  display: grid;
-  grid-template-columns: 3em 1fr;
-  height: 100%;
-  width: 100%;
+.day-column:last-child {
+  border-right: none;
 }
 
-/* Style pour la colonne des heures */
+.header-cell {
+  padding: .5vmin;
+  text-transform: uppercase;
+  font-size: 1.5vmin;
+  text-align: center;
+  min-height: 3em;
+  border-bottom: 1px solid #888;
+}
+
+.time-blocks {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.time-block {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+  display: flex;
+}
+
 .hours-column {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-  background-color: white;
-}
-
-/* Style pour la zone de contenu */
-.content-area {
+  width: 1em;
   padding: 0.3em;
-  height: 100%;
-}
-
-/* Style pour l'affichage de l'heure */
-td::before {
-  content: attr(data-time);
-  position: absolute;
-  left: 2px;
-  top: 2px;
-  font-size: 0.8vmin;
-  color: #666;
-}
-
-.hour-marker {
-  position: absolute;
-  left: 2px;
-  top: 0;
-  bottom: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-around; /* Changé de space-between à space-around */
-  align-items: flex-start;
-  font-size: 0.8vmin;
-  color: #666;
-  padding: 0;
-  box-sizing: border-box;
-  width: 3em;
-  z-index: 1; /* Pour s'assurer que le texte reste au-dessus de la ligne */
+  justify-content: space-between;
+  align-items: center;
 }
 
 .hour-time {
-  position: relative;
-  display: block;
-  text-align: left;
-  padding-right: 1em;
   font-size: 0.8vmin;
   color: #666;
-  display: block;
-}
-
-.hour-time::after {
-  content: '';
-  position: absolute;
-  left: 3em; /* Espace pour le texte de l'heure */
-  right: -3000px; /* Valeur grande pour s'étendre sur toute la largeur */
-  top: 50%;
-  border-bottom: 1px dotted #ccc;
-  z-index: 0;
+  background: white;
+  padding: 2px;
+  margin-top: -0.5em;
 }
 
 .hour-dot {
-  display: block;
-  width: 3px;
-  height: 3px;
-  background-color: #666;
-  border-radius: 50%;
-  margin: 0;
-  position: relative;
-  z-index: 1;
-  display: block;
-  width: 3px;
-  height: 3px;
-  background-color: #666;
-  border-radius: 50%;
-  margin: 0.2em auto;
+  color: #666;
+  font-size: 1.5vmin;  /* Augmenté de 1vmin à 1.5vmin */
+  line-height: 1;
+  margin: auto;
+  font-weight: bold;   /* Ajout du gras pour plus d'impact visuel */
 }
 
-td[data-half-hour]::before {
-  content: attr(data-time) "·30";
+.content-area {
+  flex: 1;
 }
 
-td:last-child, th:last-child {
-  border-right: none;  /* Supprime la bordure droite du dernier élément */
-}
-
-th {
-  font-size: 1.5vmin;
-  padding: .5vmin;
-  text-align: center;
-}
-
-.date {
-  display: block;
-  font-size: 2vmin;
-  margin-bottom: .5em;
-  text-align: right;
+/* Suppression des styles non utilisés */
+.row, table, tbody, tr, td, th {
+  display: none;
 }
 
 #info {
@@ -236,10 +178,33 @@ select {
 .calendar-title {
   text-align: center;
   font-size: 2vmin;
-  margin: 1em 0;
-  font-weight: 300;
-  color: #666;
+  margin-bottom: 1em;
+  margin-top: 0;
 }
+
+.day-column[data-day="6"],
+.day-column[data-day="7"] {
+  display: flex;
+}
+
+/* Classe pour cacher les week-ends */
+.hide-weekends .day-column[data-day="6"],
+.hide-weekends .day-column[data-day="7"] {
+  display: none;
+}
+
+/* Style pour la nouvelle option */
+.checkbox-group {
+    margin: 1em 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.checkbox-group input[type="checkbox"] {
+    margin: 0;
+}
+
 </style>
 </head>
 <body>
@@ -250,6 +215,7 @@ select {
     <h1>Calendrier hebdomadaire</h1>
     <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> pour obtenir un planning hebdomadaire.</p>
 
+    <h2>Options</h2>
     <div class="slider-group">
         <div class="slider-header">
             <label for="locale-select">Langue</label>
@@ -269,6 +235,11 @@ select {
         </div>
         <select id="week-select"></select>
     </div>
+
+    <div class="checkbox-group">
+        <input type="checkbox" id="hide-weekends" />
+        <label for="hide-weekends">Masquer le week-end</label>
+    </div>
 </div>
 
 <div id="calendarContainer"></div>
@@ -281,7 +252,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const state = {
         locale: params.get('locale') || 'fr-FR',
         week: params.get('week') || getWeekNumber(today),
-        year: params.get('year') || today.getFullYear()
+        year: params.get('year') || today.getFullYear(),
+        hideWeekends: params.get('hideWeekends') === 'true'
     };
 
     function getWeekNumber(d) {
@@ -308,32 +280,30 @@ document.addEventListener("DOMContentLoaded", function() {
         
         const weekStart = getDateOfWeek(state.week, state.year);
         
-        // Ajout du titre avec l'année et la semaine
         const title = createElement('h2', {
             className: 'calendar-title',
             textContent: `${state.year} - Semaine ${state.week}`
         });
-        container.appendChild(title);
         
-        const table = document.createElement('table');
-        const thead = document.createElement('thead');
-        const tbody = document.createElement('tbody');
+        const calendar = createElement('div', { 
+            className: `calendar ${state.hideWeekends ? 'hide-weekends' : ''}`
+        });
+        const calendarContent = createElement('div', { className: 'calendar-content' });
         
-        // Création de l'en-tête
-        const headerRow = document.createElement('tr');
-        
-        // Ajout des jours de la semaine avec date
+        // Création des colonnes pour chaque jour
         for (let i = 0; i < 7; i++) {
             const currentDate = new Date(weekStart);
             currentDate.setDate(weekStart.getDate() + i);
             
-            const th = createElement('th');
-            
-            const headerContent = createElement('div', {
-                className: 'header-date'
+            const dayColumn = createElement('div', { 
+                className: 'day-column',
+                dataset: { day: (currentDate.getDay() || 7).toString() }
             });
             
-            // Jour de la semaine et date
+            // En-tête du jour
+            const headerCell = createElement('div', { className: 'header-cell' });
+            const headerContent = createElement('div', { className: 'header-date' });
+            
             headerContent.append(
                 createElement('div', {
                     textContent: currentDate.toLocaleDateString(state.locale, { weekday: 'long' })
@@ -347,54 +317,39 @@ document.addEventListener("DOMContentLoaded", function() {
                 })
             );
             
-            th.appendChild(headerContent);
-            headerRow.appendChild(th);
-        }
-        thead.appendChild(headerRow);
-
-        // Création des lignes pour chaque heure
-        for (let hour = 7; hour <= 22; hour++) {
-            const timeRow = createElement('tr');
+            headerCell.appendChild(headerContent);
             
-            // Cellules pour chaque jour
-            for (let day = 0; day < 7; day++) {
-                const hourCell = createElement('td');
-                const timeCell = createElement('div', { 
-                    className: 'time-cell'
-                });
-
-                // Colonne des heures
-                const hoursColumn = createElement('div', {
-                    className: 'hours-column'
-                });
-
-                // Heure actuelle
+            // Blocs horaires
+            const timeBlocks = createElement('div', { className: 'time-blocks' });
+            
+            for (let hour = 7; hour <= 22; hour++) {
+                const timeBlock = createElement('div', { className: 'time-block' });
+                const hoursColumn = createElement('div', { className: 'hours-column' });
+                
                 hoursColumn.appendChild(createElement('span', {
                     className: 'hour-time',
                     textContent: `${hour}:00`
                 }));
-
-                // Point (sauf pour la dernière heure)
+                
+                // Dans la boucle des heures, remplacer la création du point
                 if (hour < 22) {
                     hoursColumn.appendChild(createElement('span', {
-                        className: 'hour-dot'
+                        className: 'hour-dot',
+                        textContent: '·' // Utilisation du point médian
                     }));
                 }
-
-                // Zone de contenu
-                const contentArea = createElement('div', {
-                    className: 'content-area'
-                });
                 
-                timeCell.append(hoursColumn, contentArea);
-                hourCell.appendChild(timeCell);
-                timeRow.appendChild(hourCell);
+                const contentArea = createElement('div', { className: 'content-area' });
+                timeBlock.append(hoursColumn, contentArea);
+                timeBlocks.appendChild(timeBlock);
             }
-            tbody.appendChild(timeRow);
+            
+            dayColumn.append(headerCell, timeBlocks);
+            calendarContent.appendChild(dayColumn);
         }
-
-        table.append(thead, tbody);
-        container.appendChild(table);
+        
+        calendar.appendChild(calendarContent);
+        container.append(title, calendar);
     }
 
     function createElement(tag, attrs = {}) {
@@ -437,6 +392,15 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('week-select').addEventListener('change', (e) => {
             const url = new URL(window.location);
             url.searchParams.set('week', e.target.value);
+            window.location = url;
+        });
+
+        // Ajout du gestionnaire pour la case à cocher
+        const hideWeekendsCheckbox = document.getElementById('hide-weekends');
+        hideWeekendsCheckbox.checked = state.hideWeekends;
+        hideWeekendsCheckbox.addEventListener('change', (e) => {
+            const url = new URL(window.location);
+            url.searchParams.set('hideWeekends', e.target.checked);
             window.location = url;
         });
     }
