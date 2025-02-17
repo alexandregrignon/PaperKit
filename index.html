@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GridKit - printable paper templates</title>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
@@ -22,20 +23,22 @@
             letter-spacing: 0.05em;
             color: #333;
             margin-bottom: 0;
+            font-size: clamp(2rem, 5vw, 3rem);
         }
         p {
             font-weight: 300;
             letter-spacing: 0.02em;
             color: #666;
             margin-bottom: 40px;
+            font-size: clamp(1rem, 2vw, 1.2rem);
         }
         .grid-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 30px;
             max-width: 1200px;
             margin: 0 auto;
+            padding: 0 15px;
         }
         .grid-item {
             display: flex;
@@ -45,8 +48,8 @@
             color: #333;
         }
         .icon-circle {
-            width: 120px;
-            height: 120px;
+            width: clamp(80px, 15vw, 120px);
+            height: clamp(80px, 15vw, 120px);
             border-radius: 50%;
             background-color: white;
             display: flex;
@@ -57,7 +60,7 @@
             transition: transform 0.3s, box-shadow 0.3s;
         }
         .icon-circle i {
-            font-size: 48px;
+            font-size: clamp(32px, 6vw, 48px);
             color: #666666;
         }
         .grid-item:hover .icon-circle {
@@ -66,7 +69,17 @@
         }
         .grid-item span {
             font-weight: 600;
-            font-size: 14px;
+            font-size: clamp(12px, 2vw, 14px);
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
         }
     </style>
 </head>
@@ -98,18 +111,6 @@
             </div>
             <span>Isometric Grid</span>
         </a>
-        <a href="year-calendar.html" class="grid-item">
-            <div class="icon-circle">
-                <i class="ph ph-calendar-dots"></i>
-            </div>
-            <span>Year Calendar</span>
-        </a>
-        <a href="week-calendar.html" class="grid-item">
-            <div class="icon-circle">
-                <i class="ph ph-calendar"></i>
-            </div>
-            <span>Week Calendar</span>
-        </a>
         <a href="reglure-seyes.html" class="grid-item">
             <div class="icon-circle">
                 <i class="ph ph-book"></i>
@@ -121,6 +122,18 @@
                 <i class="ph ph-list-dashes"></i>
             </div>
             <span>College Ruled</span>
+        </a>
+        <a href="year-calendar.html" class="grid-item">
+            <div class="icon-circle">
+                <i class="ph ph-calendar-dots"></i>
+            </div>
+            <span>Year Calendar</span>
+        </a>
+        <a href="week-calendar.html" class="grid-item">
+            <div class="icon-circle">
+                <i class="ph ph-calendar"></i>
+            </div>
+            <span>Week Calendar</span>
         </a>
     </div>
 </body>

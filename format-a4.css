@@ -1,5 +1,22 @@
-/* Configuration des pages pour l'impression */
+/* Orientation portrait */
 @page {
-    size: A4;
+    size: A4 portrait;
     margin: 0;
+}
+
+.paper {
+    width: 210mm;
+    height: 297mm;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+/* Orientation paysage */
+@page :landscape {
+    size: A4 landscape;
+}
+
+.paper.landscape {
+    width: 297mm;
+    height: 210mm;
 }

@@ -15,6 +15,15 @@
             <h1>Isometric Grid (A4)</h1>
             <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> sur un format de papier A4 afin d'obtenir une grille isométrique avec des lignes verticales et des lignes à ±30°.</p>
             <h2>Options</h2>
+            <div class="option-group">
+                <div class="option-header">
+                    <label for="orientation">Orientation</label>
+                </div>
+                <select id="orientation" name="orientation">
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Paysage</option>
+                </select>
+            </div>
             <div class="slider-group">
                 <div class="slider-header">
                     <label for="spacing">Espacement des lignes</label>
@@ -46,6 +55,21 @@
             var pageHeight = 297;
             var svg = document.getElementById("grid");
             var angles = [90, 30, -30];
+
+            function updatePageDimensions(orientation) {
+                var paperElement = document.querySelector('.paper');
+                if (orientation === 'landscape') {
+                    pageWidth = 297;
+                    pageHeight = 210;
+                    paperElement.classList.add('landscape');
+                } else {
+                    pageWidth = 210;
+                    pageHeight = 297;
+                    paperElement.classList.remove('landscape');
+                }
+                svg.setAttribute('width', pageWidth + 'mm');
+                svg.setAttribute('height', pageHeight + 'mm');
+            }
 
             function createGrid(spacing, pageMargin) {
                 // Définition du clip pour la marge
@@ -123,13 +147,16 @@
 
             var spacingSlider = document.getElementById("spacing");
             var marginSlider = document.getElementById("margin");
+            var orientationSelect = document.getElementById("orientation");
             var spacingValue = document.getElementById("spacingValue");
             var marginValue = document.getElementById("marginValue");
 
             function updateGrid() {
                 var spacing = parseInt(spacingSlider.value);
                 var pageMargin = parseInt(marginSlider.value);
+                var orientation = orientationSelect.value;
 
+                updatePageDimensions(orientation);
                 spacingValue.textContent = spacing;
                 marginValue.textContent = pageMargin;
 
@@ -140,6 +167,7 @@
 
             spacingSlider.addEventListener("input", updateGrid);
             marginSlider.addEventListener("input", updateGrid);
+            orientationSelect.addEventListener("change", updateGrid);
 
             // Création initiale de la grille
             createGrid(5, 5);

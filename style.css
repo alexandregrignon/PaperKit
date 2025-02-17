@@ -81,13 +81,6 @@ html, body {
     margin-top: 2em;
 }
 
-/* Apparence de la feuille simulée (page A4) */
-.paper {
-    width: 210mm;
-    height: 297mm;
-    background: white;
-}
-
 /* Centrage des éléments SVG */
 svg {
     display: block;
