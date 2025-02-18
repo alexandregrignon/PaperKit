@@ -15,15 +15,6 @@
             <h1>Lined Paper (A4)</h1>
             <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> sur un format de papier A4 afin d'obtenir une feuille lignée.</p>
             <h2>Options</h2>
-            <div class="option-group">
-                <div class="option-header">
-                    <label for="orientation">Orientation</label>
-                </div>
-                <select id="orientation" name="orientation">
-                    <option value="portrait">Portrait</option>
-                    <option value="landscape">Paysage</option>
-                </select>
-            </div>
             <div class="slider-group">
                 <div class="slider-header">
                     <label for="spacing">Espacement des lignes</label>
@@ -37,6 +28,13 @@
                     <div class="value"><span id="marginValue">5</span> mm</div>
                 </div>
                 <input type="range" id="margin" name="margin" min="1" max="20" value="5">
+            </div>
+            <div class="toggle-group">
+                <label class="toggle">
+                    <input type="checkbox" id="rotate">
+                    <span class="slider"></span>
+                    <span class="label">Rotation des lignes à 90°</span>
+                </label>
             </div>
             <div class="credits">
                 Projet <a href="https://github.com/alexandregrignon/GridKit">GridKit</a> par <a href="https://alexandregrignon.fr">Alexandre Grignon</a>
@@ -55,41 +53,30 @@
             var pageHeight = 297;
             var svg = document.getElementById("grid");
 
-            function updatePageDimensions(orientation) {
-                var paperElement = document.querySelector('.paper');
-                if (orientation === 'landscape') {
-                    pageWidth = 297;
-                    pageHeight = 210;
-                    paperElement.classList.add('landscape');
-                } else {
-                    pageWidth = 210;
-                    pageHeight = 297;
-                    paperElement.classList.remove('landscape');
-                }
-                svg.setAttribute('width', pageWidth + 'mm');
-                svg.setAttribute('height', pageHeight + 'mm');
-            }
+            function createGrid(spacing, pageMargin, rotated) {
+                // Calcul du nombre de lignes selon l'orientation
+                var effectiveSpace = rotated ? (pageWidth - 2 * pageMargin) : (pageHeight - 2 * pageMargin);
+                var nLines = Math.floor(effectiveSpace / spacing) + 1;
 
-            function createGrid(spacing, pageMargin) {
-                // Calcul de la zone effective
-                var effectiveWidth = pageWidth - 2 * pageMargin;
-                var effectiveHeight = pageHeight - 2 * pageMargin;
-
-                // Calcul du nombre de lignes
-                var nY = Math.floor(effectiveHeight / spacing) + 1;
-
-                // Calcul de marge additionnelle pour centrer verticalement
-                var extraMarginY = (effectiveHeight - (nY - 1) * spacing) / 2;
-                var marginY = pageMargin + extraMarginY;
-
-                // Création des lignes horizontales
-                for (var j = 0; j < nY; j++) {
-                    var y = marginY + j * spacing;
+                // Création des lignes
+                for (var i = 0; i < nLines; i++) {
+                    var pos = pageMargin + (i * spacing);
                     var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                    line.setAttribute("x1", pageMargin + "mm");
-                    line.setAttribute("y1", y + "mm");
-                    line.setAttribute("x2", (pageWidth - pageMargin) + "mm");
-                    line.setAttribute("y2", y + "mm");
+                    
+                    if (!rotated) {
+                        // Lignes horizontales
+                        line.setAttribute("x1", pageMargin + "mm");
+                        line.setAttribute("y1", pos + "mm");
+                        line.setAttribute("x2", (pageWidth - pageMargin) + "mm");
+                        line.setAttribute("y2", pos + "mm");
+                    } else {
+                        // Lignes verticales
+                        line.setAttribute("x1", pos + "mm");
+                        line.setAttribute("y1", pageMargin + "mm");
+                        line.setAttribute("x2", pos + "mm");
+                        line.setAttribute("y2", (pageHeight - pageMargin) + "mm");
+                    }
+                    
                     line.setAttribute("stroke", "#bbb");
                     line.setAttribute("stroke-width", "0.2mm");
                     svg.appendChild(line);
@@ -98,16 +85,15 @@
 
             var spacingSlider = document.getElementById("spacing");
             var marginSlider = document.getElementById("margin");
-            var orientationSelect = document.getElementById("orientation");
+            var rotateSwitch = document.getElementById("rotate");
             var spacingValue = document.getElementById("spacingValue");
             var marginValue = document.getElementById("marginValue");
 
             function updateGrid() {
                 var spacing = parseInt(spacingSlider.value);
                 var pageMargin = parseInt(marginSlider.value);
-                var orientation = orientationSelect.value;
+                var rotated = rotateSwitch.checked;
 
-                updatePageDimensions(orientation);
                 spacingValue.textContent = spacing;
                 marginValue.textContent = pageMargin;
 
@@ -116,15 +102,15 @@
                     svg.removeChild(svg.firstChild);
                 }
 
-                createGrid(spacing, pageMargin);
+                createGrid(spacing, pageMargin, rotated);
             }
 
             spacingSlider.addEventListener("input", updateGrid);
             marginSlider.addEventListener("input", updateGrid);
-            orientationSelect.addEventListener("change", updateGrid);
+            rotateSwitch.addEventListener("change", updateGrid);
 
             // Création initiale de la grille
-            createGrid(7, 5);
+            createGrid(7, 5, false);
         })();
     </script>
 </body>
