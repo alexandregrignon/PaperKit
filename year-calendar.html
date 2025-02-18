@@ -18,6 +18,13 @@ html, body {
   font-family: 'Oswald';
 }
 
+html {
+  /* Forcer l'impression des couleurs de fond */
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+
 #calendarContainer {
   flex: 1;
   display: flex;
@@ -41,15 +48,17 @@ html, body {
   flex-direction: column;
   min-width: 0;
   min-height: 0;
+  /* Force chaque colonne à avoir la même taille */
+  height: 100%;
 }
 
 .month-header {
   flex: 0 0 auto;
   text-transform: uppercase;
   font-size: 1.1vmin;
+  text-align: center;
+  border-bottom: 1px solid #888;
   padding: 0;
-  font-weight: bold;
-  margin-bottom: .3vmin;
 }
 
 /* Cellules des jours */
@@ -64,7 +73,12 @@ html, body {
   font-size: .9vmin;
   font-weight: 300;
   color: #000;
-  margin-bottom: 1px;
+}
+
+/* Modifier le style des cellules vides */
+.day-cell.empty {
+  visibility: hidden; /* Cache complètement le contenu tout en préservant l'espace */
+  border-bottom-color: transparent;
 }
 
 .day-cell:empty {
@@ -105,6 +119,10 @@ p {
   }
   .weekend {
     background: #d8d8d8 !important;
+    /* Forcer l'impression des couleurs de fond pour Firefox */
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
 }
 </style>
@@ -239,31 +257,53 @@ document.addEventListener("DOMContentLoaded", function() {
         elements.container.innerHTML = '';
         const yearDisplay = createElement('p', { textContent: state.year });
         const calendarGrid = createElement('div', { className: 'calendar-grid' });
-
-        // Création des colonnes de mois
         const monthColumns = Array.from({length: 12}, (_, m) => createMonthColumn(m));
         
         if (state.layout === 'aligned-weekdays') {
-            // Vue alignée par jours de la semaine
+            // Calculer d'abord la taille maximale nécessaire
+            let maxCellCount = 0;
+            const monthsData = [];
+
+            // Première passe : calculer le nombre de cellules nécessaire pour chaque mois
             for (let m = 0; m < 12; m++) {
-                const month = monthColumns[m];
                 const firstDay = new Date(state.year, m, 1);
                 const daysInMonth = new Date(state.year, m + 1, 0).getDate();
-                let dayCounter = 1;
+                const firstWeekday = (firstDay.getDay() + 6) % 7; // lundi = 0, dimanche = 6
                 
-                // Remplir les jours vides du début
-                const firstWeekday = firstDay.getDay() || 7;
-                for (let i = 1; i < firstWeekday; i++) {
-                    month.appendChild(createElement('div', { className: 'day-cell' }));
+                const totalCells = firstWeekday + daysInMonth;
+                maxCellCount = Math.max(maxCellCount, totalCells);
+                
+                monthsData.push({
+                    daysInMonth,
+                    firstWeekday,
+                    totalCells
+                });
+            }
+
+            // Deuxième passe : créer les colonnes avec le bon nombre de cellules
+            for (let m = 0; m < 12; m++) {
+                const month = monthColumns[m];
+                const { daysInMonth, firstWeekday, totalCells } = monthsData[m];
+                const monthCells = [];
+                
+                // Cellules vides du début
+                for (let i = 0; i < firstWeekday; i++) {
+                    monthCells.push(createEmptyCell());
                 }
 
-                // Remplir les jours du mois
-                while (dayCounter <= daysInMonth) {
-                    const date = new Date(state.year, m, dayCounter);
-                    const cell = createDateCell(date, true);
-                    month.appendChild(cell);
-                    dayCounter++;
+                // Jours du mois
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(state.year, m, day);
+                    monthCells.push(createDateCell(date, true));
                 }
+
+                // Ajouter des cellules vides pour atteindre la hauteur maximale
+                const emptyCellsNeeded = maxCellCount - totalCells;
+                for (let i = 0; i < emptyCellsNeeded; i++) {
+                    monthCells.push(createEmptyCell());
+                }
+
+                month.append(...monthCells);
             }
         } else {
             // Vue standard (1-31)
@@ -277,7 +317,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         const cell = createDateCell(date, false);
                         month.appendChild(cell);
                     } else {
-                        month.appendChild(createElement('div', { className: 'day-cell' }));
+                        month.appendChild(createEmptyCell());
                     }
                 }
             }
@@ -289,9 +329,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Simplification de la fonction createDateCell
     function createDateCell(date, isAligned = false) {
-        const isoWeekday = date.getDay() || 7;
+        // Convertir pour que lundi = 0, dimanche = 6
+        const weekday = (date.getDay() + 6) % 7;
+        
         const cell = createElement('div', {
-            className: `day-cell${isoWeekday > 5 ? ' weekend' : ''}`
+            className: `day-cell${weekday >= 5 ? ' weekend' : ''}`
         });
 
         const spanDate = createElement('span', {
@@ -304,6 +346,22 @@ document.addEventListener("DOMContentLoaded", function() {
             textContent: formatDate(date, { weekday: 'short' }).charAt(0)
         });
 
+        cell.append(spanDate, ' ', spanDay);
+        return cell;
+    }
+
+    // Modifier la création des cellules vides
+    function createEmptyCell() {
+        const cell = createElement('div', { className: 'day-cell empty' });
+        // On garde la même structure mais avec des espaces pour maintenir la hauteur
+        const spanDate = createElement('span', {
+            className: 'date',
+            textContent: '\u00A0\u00A0' // Deux espaces insécables
+        });
+        const spanDay = createElement('span', {
+            className: 'day',
+            textContent: '\u00A0' // Un espace insécable
+        });
         cell.append(spanDate, ' ', spanDay);
         return cell;
     }
