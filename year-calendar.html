@@ -8,68 +8,104 @@
 <meta property="og:description" content="Un calendrier imprimable avec toute l'année sur une seule page">
 <link rel="stylesheet" href="style.css">
 <style>
-@media print {
-  @page {
-    margin: 0;
-    padding: 1em;
-  }
-  td {
-    font-size: 8px !important;
-  }
-  .weekend {
-    background: #d8d8d8 !important;
-  }
-}
-html {
+/* Reset et styles de base */
+html, body {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
   font-family: 'Oswald';
 }
-table {
-  width: 100%;
-  height: calc(100% - 2.5em);
-  border-collapse: separate;
-  border-spacing: .5em 0;
+
+#calendarContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1em;
+  box-sizing: border-box;
+  min-height: 0;
 }
-td, th {
+
+/* Grille du calendrier */
+.calendar-grid {
+  flex: 1;
+  display: flex;
+  gap: .5em;
+  min-height: 0;
+}
+
+.month-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.month-header {
+  flex: 0 0 auto;
+  text-transform: uppercase;
+  font-size: 1.1vmin;
+  padding: 0;
+  font-weight: bold;
+  margin-bottom: .3vmin;
+}
+
+/* Cellules des jours */
+.day-cell {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
   text-transform: uppercase;
   border-bottom: 1px solid #888;
-  padding: .3vmin .3vmin;
+  padding: .3vmin;
   font-size: .9vmin;
   font-weight: 300;
   color: #000;
+  margin-bottom: 1px;
 }
-th {
-  font-size: 1.1vmin;
-  padding: 0;
-}
-td:empty {
+
+.day-cell:empty {
   border: 0;
 }
+
+.weekend {
+  background: #eee;
+  font-weight: 400;
+}
+
 .date {
   display: inline-block;
   width: 1.1em;
 }
+
 .day {
   display: inline-block;
   text-align: center;
   width: 1em;
   color: #888;
 }
-.weekend {
-  background: #eee;
-  font-weight: 400;
-}
+
+/* Styles généraux */
 p {
   margin: 0 0 .5em 0;
   text-align: center;
 }
-* {
-  color-adjust: exact;
-  -webkit-print-color-adjust: exact;
-}
 
-/* Ajout pour que la div calendarContainer fasse 100% de la hauteur de l'écran */
-#calendarContainer {
-  height: 100vh;
+/* Styles d'impression */
+@media print {
+  @page {
+    margin: 0;
+    padding: 1em;
+  }
+  .day-cell {
+    font-size: 8px !important;
+  }
+  .weekend {
+    background: #d8d8d8 !important;
+  }
 }
 </style>
 </head>
@@ -187,22 +223,75 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Création des en-têtes de mois
-    function createMonthHeaders() {
-        return createElement('tr', {}, 
-            Array.from({length: 12}, (_, m) => {
-                const date = new Date(state.year, m, 1);
-                return createElement('th', {
-                    textContent: formatDate(date, { month: 'short' })
-                });
-            })
-        );
+    function createMonthColumn(monthIndex) {
+        const column = createElement('div', { className: 'month-column' });
+        const date = new Date(state.year, monthIndex, 1);
+        const header = createElement('div', {
+            className: 'month-header',
+            textContent: formatDate(date, { month: 'short' })
+        });
+        column.appendChild(header);
+        return column;
+    }
+
+    // Création du calendrier
+    function createCalendarGrid() {
+        elements.container.innerHTML = '';
+        const yearDisplay = createElement('p', { textContent: state.year });
+        const calendarGrid = createElement('div', { className: 'calendar-grid' });
+
+        // Création des colonnes de mois
+        const monthColumns = Array.from({length: 12}, (_, m) => createMonthColumn(m));
+        
+        if (state.layout === 'aligned-weekdays') {
+            // Vue alignée par jours de la semaine
+            for (let m = 0; m < 12; m++) {
+                const month = monthColumns[m];
+                const firstDay = new Date(state.year, m, 1);
+                const daysInMonth = new Date(state.year, m + 1, 0).getDate();
+                let dayCounter = 1;
+                
+                // Remplir les jours vides du début
+                const firstWeekday = firstDay.getDay() || 7;
+                for (let i = 1; i < firstWeekday; i++) {
+                    month.appendChild(createElement('div', { className: 'day-cell' }));
+                }
+
+                // Remplir les jours du mois
+                while (dayCounter <= daysInMonth) {
+                    const date = new Date(state.year, m, dayCounter);
+                    const cell = createDateCell(date, true);
+                    month.appendChild(cell);
+                    dayCounter++;
+                }
+            }
+        } else {
+            // Vue standard (1-31)
+            for (let m = 0; m < 12; m++) {
+                const month = monthColumns[m];
+                const daysInMonth = new Date(state.year, m + 1, 0).getDate();
+                
+                for (let day = 1; day <= 31; day++) {
+                    if (day <= daysInMonth) {
+                        const date = new Date(state.year, m, day);
+                        const cell = createDateCell(date, false);
+                        month.appendChild(cell);
+                    } else {
+                        month.appendChild(createElement('div', { className: 'day-cell' }));
+                    }
+                }
+            }
+        }
+
+        calendarGrid.append(...monthColumns);
+        elements.container.append(yearDisplay, calendarGrid);
     }
 
     // Simplification de la fonction createDateCell
     function createDateCell(date, isAligned = false) {
         const isoWeekday = date.getDay() || 7;
-        const td = createElement('td', {
-            className: isoWeekday > 5 ? 'weekend' : ''
+        const cell = createElement('div', {
+            className: `day-cell${isoWeekday > 5 ? ' weekend' : ''}`
         });
 
         const spanDate = createElement('span', {
@@ -215,78 +304,8 @@ document.addEventListener("DOMContentLoaded", function() {
             textContent: formatDate(date, { weekday: 'short' }).charAt(0)
         });
 
-        // Toujours afficher le même format
-        td.append(spanDate, ' ', spanDay);
-
-        return td;
-    }
-
-    // Création du calendrier
-    function createCalendarTable() {
-        elements.container.innerHTML = '';
-        const yearDisplay = createElement('p', { textContent: state.year });
-        const table = createElement('table');
-        const thead = createElement('thead', {}, [createMonthHeaders()]);
-        const tbody = createElement('tbody');
-
-        // Calcul des dates pour chaque mois
-        const dates = {};
-        for (let m = 1; m <= 12; m++) {
-            dates[m] = [];
-            const firstDay = new Date(state.year, m - 1, 1);
-            let firstWeekday = firstDay.getDay() || 7; // Conversion 0 (dimanche) en 7
-            let dayCounter = 1;
-            const daysInMonth = new Date(state.year, m, 0).getDate();
-
-            // Remplissage du tableau des dates
-            for (let x = 1; x <= 42; x++) {
-                if (x < firstWeekday) {
-                    dates[m][x] = 0;
-                } else if (dayCounter <= daysInMonth) {
-                    dates[m][x] = dayCounter++;
-                } else {
-                    dates[m][x] = 0;
-                }
-            }
-        }
-
-        // Création des lignes selon le mode d'affichage
-        if (state.layout === 'aligned-weekdays') {
-            // Vue alignée par jours de la semaine
-            for (let day = 1; day <= 42; day++) {
-                const tr = createElement('tr');
-                for (let m = 1; m <= 12; m++) {
-                    const d = dates[m][day];
-                    if (d === 0) {
-                        tr.appendChild(createElement('td'));
-                    } else {
-                        const date = new Date(state.year, m - 1, d);
-                        tr.appendChild(createDateCell(date, true));
-                    }
-                }
-                if (tr.textContent.trim()) { // N'ajoute que les lignes non vides
-                    tbody.appendChild(tr);
-                }
-            }
-        } else {
-            // Vue standard (1-31)
-            for (let day = 1; day <= 31; day++) {
-                const tr = createElement('tr');
-                for (let m = 1; m <= 12; m++) {
-                    const daysInMonth = new Date(state.year, m, 0).getDate();
-                    if (day > daysInMonth) {
-                        tr.appendChild(createElement('td'));
-                    } else {
-                        const date = new Date(state.year, m - 1, day);
-                        tr.appendChild(createDateCell(date, false));
-                    }
-                }
-                tbody.appendChild(tr);
-            }
-        }
-
-        table.append(thead, tbody);
-        elements.container.append(yearDisplay, table);
+        cell.append(spanDate, ' ', spanDay);
+        return cell;
     }
 
     // Initialisation des gestionnaires d'événements
@@ -313,7 +332,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Initialisation
     initializeYearSelect();
     initializeEventListeners();
-    createCalendarTable();
+    createCalendarGrid();
 });
 </script>
 </body>
