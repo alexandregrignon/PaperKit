@@ -39,6 +39,8 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 15px;
+            margin-bottom: 2em;
+            justify-items: start; /* Aligner les éléments à gauche */
         }
         .grid-item {
             display: flex;
@@ -81,60 +83,99 @@
                 gap: 20px;
             }
         }
+
+        /* Styles pour les catégories */
+        .category {
+            margin: 2em auto;
+            max-width: 1200px;
+        }
+
+        .category h2 {
+            font-family: 'Oswald', sans-serif;
+            font-weight: 300;
+            text-transform: uppercase;
+            color: #666;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            margin-bottom: 1.5em;
+            text-align: left;
+            padding: 0 15px;
+        }
     </style>
 </head>
 <body>
     <h1>GridKit</h1>
     <p>printable paper templates</p>
-    <div class="grid-container">
-        <a href="dot-grid.html" class="grid-item">
-            <div class="icon-circle">
-                <i class="ph ph-dots-nine"></i>
-            </div>
-            <span>Dot Grid</span>
-        </a>
-        <a href="graph-paper.html" class="grid-item">
-            <div class="icon-circle">
-                <i class="ph ph-grid-four"></i>
-            </div>
-            <span>Graph Paper</span>
-        </a>
-        <a href="lined-paper.html" class="grid-item">
-            <div class="icon-circle">
-                <i class="ph ph-list"></i>
-            </div>
-            <span>Lined Paper</span>
-        </a>
-        <a href="isometric.html" class="grid-item">
-            <div class="icon-circle">
-                <i class="ph ph-cube"></i>
-            </div>
-            <span>Isometric Grid</span>
-        </a>
-        <a href="reglure-seyes.html" class="grid-item">
-            <div class="icon-circle">
-                <i class="ph ph-book"></i>
-            </div>
-            <span>Réglure Seyès</span>
-        </a>
-        <a href="college-ruled.html" class="grid-item">
-            <div class="icon-circle">
-                <i class="ph ph-list-dashes"></i>
-            </div>
-            <span>College Ruled</span>
-        </a>
-        <a href="year-calendar.html" class="grid-item">
-            <div class="icon-circle">
-                <i class="ph ph-calendar-dots"></i>
-            </div>
-            <span>Year Calendar</span>
-        </a>
-        <a href="week-calendar.html" class="grid-item">
-            <div class="icon-circle">
-                <i class="ph ph-calendar"></i>
-            </div>
-            <span>Week Calendar</span>
-        </a>
+    
+    <div class="category">
+        <h2>Trames génériques</h2>
+        <div class="grid-container">
+            <a href="dot-grid.html" class="grid-item">
+                <div class="icon-circle">
+                    <i class="ph ph-dots-nine"></i>
+                </div>
+                <span>Dot Grid</span>
+            </a>
+            <a href="graph-paper.html" class="grid-item">
+                <div class="icon-circle">
+                    <i class="ph ph-grid-four"></i>
+                </div>
+                <span>Graph Paper</span>
+            </a>
+            <a href="lined-paper.html" class="grid-item">
+                <div class="icon-circle">
+                    <i class="ph ph-list"></i>
+                </div>
+                <span>Lined Paper</span>
+            </a>
+            <a href="isometric.html" class="grid-item">
+                <div class="icon-circle">
+                    <i class="ph ph-cube"></i>
+                </div>
+                <span>Isometric Grid</span>
+            </a>
+            <a href="reglure-seyes.html" class="grid-item">
+                <div class="icon-circle">
+                    <i class="ph ph-book"></i>
+                </div>
+                <span>Réglure Seyès</span>
+            </a>
+            <a href="college-ruled.html" class="grid-item">
+                <div class="icon-circle">
+                    <i class="ph ph-list-dashes"></i>
+                </div>
+                <span>College Ruled</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="category">
+        <h2>Prise de notes</h2>
+        <div class="grid-container">
+            <a href="cornell-notes.html" class="grid-item">
+                <div class="icon-circle">
+                    <i class="ph ph-bookmark"></i>
+                </div>
+                <span>Cornell Notes</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="category">
+        <h2>Calendriers</h2>
+        <div class="grid-container">
+            <a href="year-calendar.html" class="grid-item">
+                <div class="icon-circle">
+                    <i class="ph ph-calendar-dots"></i>
+                </div>
+                <span>Year Calendar</span>
+            </a>
+            <a href="week-calendar.html" class="grid-item">
+                <div class="icon-circle">
+                    <i class="ph ph-calendar"></i>
+                </div>
+                <span>Week Calendar</span>
+            </a>
+        </div>
     </div>
 </body>
 </html>

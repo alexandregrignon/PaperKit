@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Cornell Notes</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="format-a4.css">
+</head>
+<body>
+    <div id="main">
+        <div id="info">
+            <nav>
+                <a href="index.html">&larr; retour à la liste des templates</a>
+            </nav>
+            <h1>Cornell Notes (A4)</h1>
+            <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> sur un format de papier A4 pour la méthode Cornell de prise de notes.</p>
+            
+            <h2>Options</h2>
+            <div class="option-group">
+                <div class="text-input-group">
+                    <label for="pageTitle">Titre :</label>
+                    <input type="text" id="pageTitle" placeholder="Mon titre">
+                </div>
+                <div class="text-input-group">
+                    <label for="pageSubject">Sujet :</label>
+                    <input type="text" id="pageSubject" placeholder="Mon sujet">
+                </div>
+                <div class="text-input-group">
+                    <label for="pageDate">Date :</label>
+                    <input type="text" id="pageDate" placeholder="JJ/MM/AAAA">
+                </div>
+
+                <div class="select-group">
+                    <label for="layoutType">Format :</label>
+                    <select id="layoutType">
+                        <option value="standard">Standard (2.5" | 6" | 2.5")</option>
+                        <option value="wide">Large colonne de rappel (3" | 5.5" | 2.5")</option>
+                        <option value="compact">Compact (2" | 6.5" | 2.5")</option>
+                    </select>
+                </div>
+                
+                <div class="toggle-group">
+                    <label class="toggle">
+                        <input type="checkbox" id="showLabels" checked>
+                        <span class="slider"></span>
+                        <span class="label">Afficher les étiquettes des zones</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="credits">
+                Projet <a href="https://github.com/alexandregrignon/GridKit">GridKit</a> par <a href="https://alexandregrignon.fr">Alexandre Grignon</a>
+            </div>
+        </div>
+        <div class="paper">
+            <svg id="grid" width="210mm" height="297mm" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+            const pageWidth = 210; // mm
+            const pageHeight = 297; // mm
+            const LINE_SPACING = 7.1; // mm
+            const TOP_MARGIN = 25; // mm pour l'en-tête
+            const SUMMARY_HEIGHT = 60; // mm
+            
+            const layouts = {
+                standard: { recall: 63.5, notes: 152.4 }, // 2.5" | 6"
+                wide: { recall: 76.2, notes: 139.7 },     // 3" | 5.5"
+                compact: { recall: 50.8, notes: 165.1 }   // 2" | 6.5"
+            };
+
+            const svg = document.getElementById("grid");
+            const layoutSelect = document.getElementById("layoutType");
+            const showLabelsCheckbox = document.getElementById("showLabels");
+            const titleInput = document.getElementById("pageTitle");
+            const subjectInput = document.getElementById("pageSubject");
+            const dateInput = document.getElementById("pageDate");
+
+            function createText(x, y, text, options = {}) {
+                const textElement = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                textElement.setAttribute("x", x + "mm");
+                textElement.setAttribute("y", y + "mm");
+                textElement.setAttribute("font-family", "Inter, sans-serif");
+                textElement.setAttribute("font-size", options.fontSize || "3mm");
+                textElement.setAttribute("fill", options.color || "#666");
+                textElement.textContent = text;
+                return textElement;
+            }
+
+            function createGrid() {
+                const layout = layouts[layoutSelect.value];
+                const showLabels = showLabelsCheckbox.checked;
+                
+                while (svg.firstChild) {
+                    svg.removeChild(svg.firstChild);
+                }
+
+                // Groupes SVG
+                const mainGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                const headerGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                const linesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+                // En-tête
+                if (titleInput.value || subjectInput.value || dateInput.value) {
+                    const title = createText(5, 10, titleInput.value, { fontSize: "4mm" });
+                    const subject = createText(5, 15, subjectInput.value);
+                    const date = createText(layout.recall + 5, 10, dateInput.value);
+                    headerGroup.appendChild(title);
+                    headerGroup.appendChild(subject);
+                    headerGroup.appendChild(date);
+                }
+
+                // Étiquettes des zones
+                if (showLabels) {
+                    const keyPoints = createText(5, 35, "POINTS CLÉS");
+                    const notes = createText(layout.recall + 5, 35, "NOTES");
+                    const summary = createText(5, pageHeight - SUMMARY_HEIGHT + 5, "SYNTHÈSE");
+                    headerGroup.appendChild(keyPoints);
+                    headerGroup.appendChild(notes);
+                    headerGroup.appendChild(summary);
+                }
+
+                // Lignes de structure
+                const structureLines = [
+                    [layout.recall, 0, layout.recall, pageHeight - SUMMARY_HEIGHT],
+                    [0, pageHeight - SUMMARY_HEIGHT, pageWidth, pageHeight - SUMMARY_HEIGHT]
+                ];
+
+                structureLines.forEach(([x1, y1, x2, y2]) => {
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", x1 + "mm");
+                    line.setAttribute("y1", y1 + "mm");
+                    line.setAttribute("x2", x2 + "mm");
+                    line.setAttribute("y2", y2 + "mm");
+                    line.setAttribute("stroke", "#ff0000");
+                    line.setAttribute("stroke-width", "0.5");
+                    mainGroup.appendChild(line);
+                });
+
+                // Lignes horizontales
+                const startY = TOP_MARGIN;
+                const endY = pageHeight - SUMMARY_HEIGHT;
+                const nLines = Math.floor((endY - startY) / LINE_SPACING);
+
+                for (let i = 0; i <= nLines; i++) {
+                    const y = startY + (i * LINE_SPACING);
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", layout.recall + "mm");
+                    line.setAttribute("y1", y + "mm");
+                    line.setAttribute("x2", pageWidth + "mm");
+                    line.setAttribute("y2", y + "mm");
+                    line.setAttribute("stroke", "#a8c7e0");
+                    line.setAttribute("stroke-width", "0.5");
+                    linesGroup.appendChild(line);
+                }
+
+                // Lignes de la zone de synthèse
+                const nSummaryLines = Math.floor(SUMMARY_HEIGHT / LINE_SPACING);
+                for (let i = 1; i <= nSummaryLines; i++) {
+                    const y = pageHeight - SUMMARY_HEIGHT + (i * LINE_SPACING);
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", "0");
+                    line.setAttribute("y1", y + "mm");
+                    line.setAttribute("x2", pageWidth + "mm");
+                    line.setAttribute("y2", y + "mm");
+                    line.setAttribute("stroke", "#a8c7e0");
+                    line.setAttribute("stroke-width", "0.5");
+                    linesGroup.appendChild(line);
+                }
+
+                svg.appendChild(linesGroup);
+                svg.appendChild(mainGroup);
+                svg.appendChild(headerGroup);
+            }
+
+            // Event listeners
+            [layoutSelect, showLabelsCheckbox, titleInput, subjectInput, dateInput].forEach(
+                element => element.addEventListener("input", createGrid)
+            );
+
+            // Création initiale
+            createGrid();
+        })();
+    </script>
+
+    <style>
+        .text-input-group {
+            margin: 0.5em 0;
+        }
+        .text-input-group label {
+            display: block;
+            margin-bottom: 0.3em;
+            font-size: 0.8em;
+            color: #999;
+        }
+        .text-input-group input {
+            width: 100%;
+            padding: 0.5em;
+            background: #444;
+            border: 1px solid #555;
+            border-radius: 3px;
+            color: #eee;
+            font-size: 0.9em;
+        }
+        .select-group {
+            margin: 1em 0;
+        }
+        .select-group label {
+            display: block;
+            margin-bottom: 0.3em;
+            font-size: 0.8em;
+            color: #999;
+        }
+    </style>
+</body>
+</html>
