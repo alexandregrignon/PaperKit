@@ -1,4 +1,4 @@
-# GridKit
+# PaperKit
 
 Printable paper templates
  
