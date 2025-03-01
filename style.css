@@ -1,5 +1,5 @@
 /* Import des polices */
-@import url('https://fonts.bunny.net/css?family=inter:300|oswald:300,400');
+@import url('https://fonts.bunny.net/css?family=inter:300|oswald:300,400|playfair-display:400,600');
 
 /* Reset & Base */
 html, body {
@@ -40,6 +40,24 @@ html, body {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     border: 1px solid #444;
+}
+
+#info h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.25em;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.2em 0.6em;
+    margin-left: 0.5em;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.5em;
+    font-weight: normal;
+    background-color: #444;
+    color: #fff;
+    border-radius: 3px;
+    vertical-align: middle;
 }
 
 /* Style de la navigation */

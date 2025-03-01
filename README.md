@@ -1,6 +1,6 @@
 # PaperKit
 
-Printable paper templates
+Des trames et modèles de pages à personnaliser et imprimer
  
 ## Inspiration
 

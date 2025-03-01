@@ -1,341 +1,347 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-<meta charset="utf-8">
-<title>Calendrier hebdomadaire - PaperKit</title>
-<meta property="og:title" content="Calendrier hebdomadaire">
-<meta property="og:description" content="Un calendrier hebdomadaire imprimable">
-<link rel="stylesheet" href="style.css">
-<style>
-html {
-  font-family: 'Oswald';
-}
+    <meta charset="utf-8">
+    <title>Calendrier hebdomadaire - PaperKit</title>
+    <meta property="og:title" content="Calendrier hebdomadaire">
+    <meta property="og:description" content="Un calendrier hebdomadaire imprimable">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        html {
+            font-family: 'Oswald';
+        }
 
-#calendarContainer {
-  height: 100vh; /* Prend toute la hauteur de la fenêtre */
-  padding: 1vmin;
-  box-sizing: border-box;
-}
+        #calendarContainer {
+            height: 100vh;
+            /* Prend toute la hauteur de la fenêtre */
+            padding: 1vmin;
+            box-sizing: border-box;
+        }
 
-/* Nouvelle structure Flexbox pour le calendrier */
-.calendar {
-  display: flex;
-  flex-direction: column;
-  height: calc(100% - 4em);
-  width: 100%;
-}
+        /* Nouvelle structure Flexbox pour le calendrier */
+        .calendar {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 4em);
+            width: 100%;
+        }
 
-.calendar-content {
-  display: flex;
-  flex: 1;
-  width: 100%;
-}
+        .calendar-content {
+            display: flex;
+            flex: 1;
+            width: 100%;
+        }
 
-.day-column {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  border-right: 1px solid #888;
-  min-width: 0;
-}
+        .day-column {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            border-right: 1px solid #888;
+            min-width: 0;
+        }
 
-.day-column:last-child {
-  border-right: none;
-}
+        .day-column:last-child {
+            border-right: none;
+        }
 
-.header-cell {
-  padding: .5vmin;
-  text-transform: uppercase;
-  font-size: 1.5vmin;
-  text-align: center;
-  min-height: 3em;
-  border-bottom: 1px solid #888;
-}
+        .header-cell {
+            padding: .5vmin;
+            text-transform: uppercase;
+            font-size: 1.5vmin;
+            text-align: center;
+            min-height: 3em;
+            border-bottom: 1px solid #888;
+        }
 
-.time-blocks {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
+        .time-blocks {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
 
-.time-block {
-  flex: 1;
-  position: relative;
-  min-height: 0;
-  display: flex;
-}
+        .time-block {
+            flex: 1;
+            position: relative;
+            min-height: 0;
+            display: flex;
+        }
 
-.hours-column {
-  width: 1em;
-  padding: 0.3em;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-}
+        .hours-column {
+            width: 1em;
+            padding: 0.3em;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-.hour-time {
-  font-size: 0.8vmin;
-  color: #666;
-  background: white;
-  padding: 2px;
-  margin-top: -0.5em;
-}
+        .hour-time {
+            font-size: 0.8vmin;
+            color: #666;
+            background: white;
+            padding: 2px;
+            margin-top: -0.5em;
+        }
 
-.hour-dot {
-  color: #666;
-  font-size: 1.5vmin;  /* Augmenté de 1vmin à 1.5vmin */
-  line-height: 1;
-  margin: auto;
-  font-weight: bold;   /* Ajout du gras pour plus d'impact visuel */
-}
+        .hour-dot {
+            color: #666;
+            font-size: 1.5vmin;
+            /* Augmenté de 1vmin à 1.5vmin */
+            line-height: 1;
+            margin: auto;
+            font-weight: bold;
+            /* Ajout du gras pour plus d'impact visuel */
+        }
 
-.content-area {
-  flex: 1;
-}
+        .content-area {
+            flex: 1;
+        }
 
-.header-date {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.2em;
-}
+        .header-date {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.2em;
+        }
 
-.month-day {
-  font-size: 1vmin;
-  color: #666;
-  font-weight: 300;
-}
+        .month-day {
+            font-size: 1vmin;
+            color: #666;
+            font-weight: 300;
+        }
 
-.calendar-title {
-  text-align: center;
-  font-size: 2vmin;
-  margin-bottom: 1em;
-  margin-top: 0;
-}
+        .calendar-title {
+            text-align: center;
+            font-size: 2vmin;
+            margin-bottom: 1em;
+            margin-top: 0;
+        }
 
-.day-column[data-day="6"],
-.day-column[data-day="7"] {
-  display: flex;
-}
+        .day-column[data-day="6"],
+        .day-column[data-day="7"] {
+            display: flex;
+        }
 
-/* Classe pour cacher les week-ends */
-.hide-weekends .day-column[data-day="6"],
-.hide-weekends .day-column[data-day="7"] {
-  display: none;
-}
-
-</style>
+        /* Classe pour cacher les week-ends */
+        .hide-weekends .day-column[data-day="6"],
+        .hide-weekends .day-column[data-day="7"] {
+            display: none;
+        }
+    </style>
 </head>
+
 <body>
-<div id="info">
-    <nav>
-        <a href="index.html">&larr; retour à la liste des templates</a>
-    </nav>
-    <h1>Calendrier hebdomadaire</h1>
-    <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> pour obtenir un planning hebdomadaire.</p>
+    <div id="info">
+        <nav>
+            <a href="index.html">&larr; retour à la liste des modèles</a>
+        </nav>
+        <h1>Calendrier hebdomadaire <span class="badge">format libre</span></h1>
+        <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> pour obtenir un planning
+            hebdomadaire.</p>
 
-    <h2>Options</h2>
-    <div class="option-group">
-        <div class="option-header">
-            <label for="locale-select">Langue</label>
+        <h2>Options</h2>
+        <div class="option-group">
+            <div class="option-header">
+                <label for="locale-select">Langue</label>
+            </div>
+            <select id="locale-select">
+                <option value="fr-FR">Français</option>
+                <option value="en-US">English (US)</option>
+                <option value="en-GB">English (UK)</option>
+                <option value="de-DE">Deutsch</option>
+                <option value="es-ES">Español</option>
+            </select>
         </div>
-        <select id="locale-select">
-            <option value="fr-FR">Français</option>
-            <option value="en-US">English (US)</option>
-            <option value="en-GB">English (UK)</option>
-            <option value="de-DE">Deutsch</option>
-            <option value="es-ES">Español</option>
-        </select>
-    </div>
 
-    <div class="option-group">
-        <div class="option-header">
-            <label for="week-select">Semaine</label>
+        <div class="option-group">
+            <div class="option-header">
+                <label for="week-select">Semaine</label>
+            </div>
+            <select id="week-select"></select>
         </div>
-        <select id="week-select"></select>
+
+        <div class="toggle-group">
+            <label class="toggle">
+                <input type="checkbox" id="hide-weekends">
+                <span class="slider"></span>
+                <span class="label">Masquer le week-end</span>
+            </label>
+        </div>
+
+        <div class="credits">
+            <a href="https://github.com/alexandregrignon/PaperKit">PaperKit</a>
+        </div>
     </div>
 
-    <div class="toggle-group">
-        <label class="toggle">
-            <input type="checkbox" id="hide-weekends">
-            <span class="slider"></span>
-            <span class="label">Masquer le week-end</span>
-        </label>
-    </div>
-</div>
+    <div id="calendarContainer"></div>
 
-<div id="calendarContainer"></div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const params = new URLSearchParams(window.location.search);
+            const today = new Date();
 
-<div class="credits">
-    Projet <a href="https://github.com/alexandregrignon/PaperKit">PaperKit</a>
-</div>
+            const state = {
+                locale: params.get('locale') || 'fr-FR',
+                week: params.get('week') || getWeekNumber(today),
+                year: params.get('year') || today.getFullYear(),
+                hideWeekends: params.get('hideWeekends') === 'true'
+            };
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const params = new URLSearchParams(window.location.search);
-    const today = new Date();
-    
-    const state = {
-        locale: params.get('locale') || 'fr-FR',
-        week: params.get('week') || getWeekNumber(today),
-        year: params.get('year') || today.getFullYear(),
-        hideWeekends: params.get('hideWeekends') === 'true'
-    };
-
-    function getWeekNumber(d) {
-        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
-        const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-        return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
-    }
-
-    function getDateOfWeek(w, y) {
-        const simple = new Date(y, 0, 1 + (w - 1) * 7);
-        const dow = simple.getDay();
-        const ISOweekStart = simple;
-        if (dow <= 4)
-            ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
-        else
-            ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
-        return ISOweekStart;
-    }
-
-    function createWeekCalendar() {
-        const container = document.getElementById('calendarContainer');
-        container.innerHTML = '';
-        
-        const weekStart = getDateOfWeek(state.week, state.year);
-        
-        const title = createElement('h2', {
-            className: 'calendar-title',
-            textContent: `${state.year} - Semaine ${state.week}`
-        });
-        
-        const calendar = createElement('div', { 
-            className: `calendar ${state.hideWeekends ? 'hide-weekends' : ''}`
-        });
-        const calendarContent = createElement('div', { className: 'calendar-content' });
-        
-        // Création des colonnes pour chaque jour
-        for (let i = 0; i < 7; i++) {
-            const currentDate = new Date(weekStart);
-            currentDate.setDate(weekStart.getDate() + i);
-            
-            const dayColumn = createElement('div', { 
-                className: 'day-column',
-                dataset: { day: (currentDate.getDay() || 7).toString() }
-            });
-            
-            // En-tête du jour
-            const headerCell = createElement('div', { className: 'header-cell' });
-            const headerContent = createElement('div', { className: 'header-date' });
-            
-            headerContent.append(
-                createElement('div', {
-                    textContent: currentDate.toLocaleDateString(state.locale, { weekday: 'long' })
-                }),
-                createElement('div', {
-                    className: 'month-day',
-                    textContent: currentDate.toLocaleDateString(state.locale, { 
-                        day: 'numeric',
-                        month: 'long'
-                    })
-                })
-            );
-            
-            headerCell.appendChild(headerContent);
-            
-            // Blocs horaires
-            const timeBlocks = createElement('div', { className: 'time-blocks' });
-            
-            for (let hour = 7; hour <= 22; hour++) {
-                const timeBlock = createElement('div', { className: 'time-block' });
-                const hoursColumn = createElement('div', { className: 'hours-column' });
-                
-                hoursColumn.appendChild(createElement('span', {
-                    className: 'hour-time',
-                    textContent: `${hour}:00`
-                }));
-                
-                // Dans la boucle des heures, remplacer la création du point
-                if (hour < 22) {
-                    hoursColumn.appendChild(createElement('span', {
-                        className: 'hour-dot',
-                        textContent: '·' // Utilisation du point médian
-                    }));
-                }
-                
-                const contentArea = createElement('div', { className: 'content-area' });
-                timeBlock.append(hoursColumn, contentArea);
-                timeBlocks.appendChild(timeBlock);
+            function getWeekNumber(d) {
+                d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+                d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+                const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+                return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
             }
-            
-            dayColumn.append(headerCell, timeBlocks);
-            calendarContent.appendChild(dayColumn);
-        }
-        
-        calendar.appendChild(calendarContent);
-        container.append(title, calendar);
-    }
 
-    function createElement(tag, attrs = {}) {
-        const element = document.createElement(tag);
-        Object.entries(attrs).forEach(([key, value]) => {
-            if (key === 'className') {
-                element.className = value;
-            } else if (key === 'dataset') {
-                Object.entries(value).forEach(([dataKey, dataValue]) => {
-                    element.dataset[dataKey] = dataValue;
+            function getDateOfWeek(w, y) {
+                const simple = new Date(y, 0, 1 + (w - 1) * 7);
+                const dow = simple.getDay();
+                const ISOweekStart = simple;
+                if (dow <= 4)
+                    ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+                else
+                    ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+                return ISOweekStart;
+            }
+
+            function createWeekCalendar() {
+                const container = document.getElementById('calendarContainer');
+                container.innerHTML = '';
+
+                const weekStart = getDateOfWeek(state.week, state.year);
+
+                const title = createElement('h2', {
+                    className: 'calendar-title',
+                    textContent: `${state.year} - Semaine ${state.week}`
                 });
-            } else {
-                element[key] = value;
+
+                const calendar = createElement('div', {
+                    className: `calendar ${state.hideWeekends ? 'hide-weekends' : ''}`
+                });
+                const calendarContent = createElement('div', { className: 'calendar-content' });
+
+                // Création des colonnes pour chaque jour
+                for (let i = 0; i < 7; i++) {
+                    const currentDate = new Date(weekStart);
+                    currentDate.setDate(weekStart.getDate() + i);
+
+                    const dayColumn = createElement('div', {
+                        className: 'day-column',
+                        dataset: { day: (currentDate.getDay() || 7).toString() }
+                    });
+
+                    // En-tête du jour
+                    const headerCell = createElement('div', { className: 'header-cell' });
+                    const headerContent = createElement('div', { className: 'header-date' });
+
+                    headerContent.append(
+                        createElement('div', {
+                            textContent: currentDate.toLocaleDateString(state.locale, { weekday: 'long' })
+                        }),
+                        createElement('div', {
+                            className: 'month-day',
+                            textContent: currentDate.toLocaleDateString(state.locale, {
+                                day: 'numeric',
+                                month: 'long'
+                            })
+                        })
+                    );
+
+                    headerCell.appendChild(headerContent);
+
+                    // Blocs horaires
+                    const timeBlocks = createElement('div', { className: 'time-blocks' });
+
+                    for (let hour = 7; hour <= 22; hour++) {
+                        const timeBlock = createElement('div', { className: 'time-block' });
+                        const hoursColumn = createElement('div', { className: 'hours-column' });
+
+                        hoursColumn.appendChild(createElement('span', {
+                            className: 'hour-time',
+                            textContent: `${hour}:00`
+                        }));
+
+                        // Dans la boucle des heures, remplacer la création du point
+                        if (hour < 22) {
+                            hoursColumn.appendChild(createElement('span', {
+                                className: 'hour-dot',
+                                textContent: '·' // Utilisation du point médian
+                            }));
+                        }
+
+                        const contentArea = createElement('div', { className: 'content-area' });
+                        timeBlock.append(hoursColumn, contentArea);
+                        timeBlocks.appendChild(timeBlock);
+                    }
+
+                    dayColumn.append(headerCell, timeBlocks);
+                    calendarContent.appendChild(dayColumn);
+                }
+
+                calendar.appendChild(calendarContent);
+                container.append(title, calendar);
             }
-        });
-        return element;
-    }
 
-    function initializeWeekSelect() {
-        const select = document.getElementById('week-select');
-        for (let i = 1; i <= 52; i++) {
-            const option = document.createElement('option');
-            option.value = i;
-            option.textContent = `Semaine ${i}`;
-            if (i === parseInt(state.week)) {
-                option.selected = true;
+            function createElement(tag, attrs = {}) {
+                const element = document.createElement(tag);
+                Object.entries(attrs).forEach(([key, value]) => {
+                    if (key === 'className') {
+                        element.className = value;
+                    } else if (key === 'dataset') {
+                        Object.entries(value).forEach(([dataKey, dataValue]) => {
+                            element.dataset[dataKey] = dataValue;
+                        });
+                    } else {
+                        element[key] = value;
+                    }
+                });
+                return element;
             }
-            select.appendChild(option);
-        }
-    }
 
-    function initializeEventListeners() {
-        document.getElementById('locale-select').value = state.locale;
-        document.getElementById('locale-select').addEventListener('change', (e) => {
-            const url = new URL(window.location);
-            url.searchParams.set('locale', e.target.value);
-            window.location = url;
+            function initializeWeekSelect() {
+                const select = document.getElementById('week-select');
+                for (let i = 1; i <= 52; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = `Semaine ${i}`;
+                    if (i === parseInt(state.week)) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                }
+            }
+
+            function initializeEventListeners() {
+                document.getElementById('locale-select').value = state.locale;
+                document.getElementById('locale-select').addEventListener('change', (e) => {
+                    const url = new URL(window.location);
+                    url.searchParams.set('locale', e.target.value);
+                    window.location = url;
+                });
+
+                document.getElementById('week-select').addEventListener('change', (e) => {
+                    const url = new URL(window.location);
+                    url.searchParams.set('week', e.target.value);
+                    window.location = url;
+                });
+
+                // Ajout du gestionnaire pour la case à cocher
+                const hideWeekendsCheckbox = document.getElementById('hide-weekends');
+                hideWeekendsCheckbox.checked = state.hideWeekends;
+                hideWeekendsCheckbox.addEventListener('change', (e) => {
+                    const url = new URL(window.location);
+                    url.searchParams.set('hideWeekends', e.target.checked);
+                    window.location = url;
+                });
+            }
+
+            initializeWeekSelect();
+            initializeEventListeners();
+            createWeekCalendar();
         });
-
-        document.getElementById('week-select').addEventListener('change', (e) => {
-            const url = new URL(window.location);
-            url.searchParams.set('week', e.target.value);
-            window.location = url;
-        });
-
-        // Ajout du gestionnaire pour la case à cocher
-        const hideWeekendsCheckbox = document.getElementById('hide-weekends');
-        hideWeekendsCheckbox.checked = state.hideWeekends;
-        hideWeekendsCheckbox.addEventListener('change', (e) => {
-            const url = new URL(window.location);
-            url.searchParams.set('hideWeekends', e.target.checked);
-            window.location = url;
-        });
-    }
-
-    initializeWeekSelect();
-    initializeEventListeners();
-    createWeekCalendar();
-});
-</script>
+    </script>
 </body>
+
 </html>
