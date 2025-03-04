@@ -144,25 +144,6 @@
             l'orientation en paysage et désactivez l'en-tête et le pied de page.</p>
 
         <h2>Options</h2>
-        <!-- Ajout du sélecteur de langue avant le sélecteur d'année -->
-        <div class="option-group">
-            <div class="option-header">
-                <label for="locale-select">Langue</label>
-            </div>
-            <select id="locale-select">
-                <option value="fr-FR">Français</option>
-                <option value="en-US">English (US)</option>
-                <option value="en-GB">English (UK)</option>
-                <option value="de-DE">Deutsch</option>
-                <option value="es-ES">Español</option>
-                <option value="it-IT">Italiano</option>
-                <option value="pt-PT">Português</option>
-                <option value="nl-NL">Nederlands</option>
-                <option value="pl-PL">Polski</option>
-                <option value="ja-JP">日本語</option>
-                <option value="zh-CN">中文</option>
-            </select>
-        </div>
         <div class="option-group">
             <div class="option-header">
                 <label for="year-select">Année</label>
@@ -195,13 +176,11 @@
             const currentYear = new Date().getFullYear();
             const state = {
                 year: params.get('year') ? parseInt(params.get('year')) : currentYear,
-                layout: params.get('layout'),
-                locale: params.get('locale') || 'fr-FR'
+                layout: params.get('layout')
             };
 
             // Initialisation des éléments UI
             const elements = {
-                localeSelect: document.getElementById("locale-select"),
                 yearSelect: document.getElementById("year-select"),
                 btnNormal: document.getElementById("btn-normal"),
                 btnAligned: document.getElementById("btn-aligned"),
@@ -236,11 +215,7 @@
 
             // Fonction pour formater une date selon la locale
             function formatDate(date, options) {
-                try {
-                    return date.toLocaleString(state.locale, options);
-                } catch (e) {
-                    return date.toLocaleString('fr-FR', options);
-                }
+                return date.toLocaleString('fr-FR', options);
             }
 
             // Génération des années dans le select
@@ -383,10 +358,6 @@
 
             // Initialisation des gestionnaires d'événements
             function initializeEventListeners() {
-                elements.localeSelect.value = state.locale;
-                elements.localeSelect.addEventListener('change', e =>
-                    navigate({ locale: e.target.value }));
-
                 elements.yearSelect.addEventListener('change', e =>
                     navigate({ year: parseInt(e.target.value) }));
 
