@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gregg Ruled (Sténographie) - PaperKit</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="format-a4.css">
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="3d089b60-6919-490c-954f-451842d8f854"></script>
+</head>
+<body>
+    <div id="main">
+        <div id="info">
+            <nav>
+                <a href="index.html">&larr; retour à la liste des modèles</a>
+            </nav>
+            <h1>Gregg Ruled <span class="badge">A4</span></h1>
+            <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> sur un format de papier A4 pour obtenir un papier de type "Gregg Ruled", utilisé notamment pour la sténographie.</p>
+            <p>Format standard : lignes espacées de 8.7mm (11/32 pouces), ligne verticale centrale.</p>
+            <h2>Options</h2>
+            <div class="option-group">
+                <div class="option-header">
+                    <label for="lineColor">Couleur des lignes</label>
+                </div>
+                <select id="lineColor">
+                    <option value="#a8c7e0">Bleu clair</option>
+                    <option value="#c4c4c4">Gris</option>
+                    <option value="#cfe2cf">Vert clair</option>
+                </select>
+            </div>
+            <div class="credits">
+                <a href="https://github.com/alexandregrignon/PaperKit">PaperKit</a>
+            </div>
+        </div>
+        <div class="paper">
+            <svg id="grid" width="210mm" height="297mm" xmlns="http://www.w3.org/2000/svg">
+                <!-- La grille sera générée par le script -->
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+            const pageWidth = 210; // mm
+            const pageHeight = 297; // mm
+            const LINE_SPACING = 8.7; // mm (11/32 inch)
+            const CENTER_LINE = pageWidth / 2; // Ligne centrale au milieu de la page
+            const svg = document.getElementById("grid");
+            const colorSelect = document.getElementById("lineColor");
+
+            function createGrid(lineColor) {
+                // Nombre de lignes sur la hauteur de la page
+                const nLines = Math.floor(pageHeight / LINE_SPACING);
+
+                // Nettoyage du SVG
+                while (svg.firstChild) {
+                    svg.removeChild(svg.firstChild);
+                }
+
+                // Création du groupe de lignes
+                const mainLines = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                mainLines.setAttribute("stroke", lineColor);
+                mainLines.setAttribute("stroke-width", "0.5");
+
+                // Lignes horizontales
+                for (let i = 0; i <= nLines; i++) {
+                    const y = i * LINE_SPACING;
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", "0");
+                    line.setAttribute("y1", y + "mm");
+                    line.setAttribute("x2", pageWidth + "mm");
+                    line.setAttribute("y2", y + "mm");
+                    mainLines.appendChild(line);
+                }
+
+                // Ligne verticale centrale en rouge
+                const centerLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                centerLine.setAttribute("x1", CENTER_LINE + "mm");
+                centerLine.setAttribute("y1", "0");
+                centerLine.setAttribute("x2", CENTER_LINE + "mm");
+                centerLine.setAttribute("y2", pageHeight + "mm");
+                centerLine.setAttribute("stroke", "#ff0000");
+                centerLine.setAttribute("stroke-width", "0.5");
+
+                // Ajout des éléments au SVG
+                svg.appendChild(mainLines);
+                svg.appendChild(centerLine);
+            }
+
+            // Event listener pour le sélecteur de couleur
+            colorSelect.addEventListener("change", function() {
+                createGrid(this.value);
+            });
+
+            // Création initiale de la grille
+            createGrid(colorSelect.value);
+        })();
+    </script>
+</body>
+</html>

@@ -103,8 +103,8 @@
             color: #888;
         }
 
-        /* Styles généraux */
-        p {
+        /* Style spécifique pour le titre de l'année */
+        .year-title {
             margin: 0 0 .5em 0;
             text-align: center;
         }
@@ -126,6 +126,26 @@
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 color-adjust: exact !important;
+            }
+        }
+
+        /* Styles pour l'impression sur 2 pages */
+        .calendar-grid.split-pages {
+            break-after: page;
+            break-inside: avoid;
+        }
+
+        .calendar-grid.split-pages .month-column:nth-child(n+7) {
+            break-before: page;
+        }
+
+        @media print {
+            .calendar-grid.split-pages {
+                page-break-after: always;
+            }
+
+            .calendar-grid.split-pages .month-column:nth-child(n+7) {
+                page-break-before: always;
             }
         }
     </style>
@@ -159,6 +179,15 @@
             <button id="btn-aligned">Semaines alignées</button>
         </div>
 
+        <!-- Ajout du switch pour l'impression sur 2 pages -->
+        <div class="toggle-group">
+            <label class="toggle">
+                <input type="checkbox" id="split-pages">
+                <span class="slider"></span>
+                <span class="label">Imprimer sur 2 pages</span>
+            </label>
+        </div>
+
         <div class="credits">
             <a
                 href="https://github.com/alexandregrignon/PaperKit">PaperKit</a> &#183; Le Calendrier est adapté en
@@ -176,7 +205,8 @@
             const currentYear = new Date().getFullYear();
             const state = {
                 year: params.get('year') ? parseInt(params.get('year')) : currentYear,
-                layout: params.get('layout')
+                layout: params.get('layout'),
+                splitPages: params.get('splitPages') === 'true'
             };
 
             // Initialisation des éléments UI
@@ -184,6 +214,7 @@
                 yearSelect: document.getElementById("year-select"),
                 btnNormal: document.getElementById("btn-normal"),
                 btnAligned: document.getElementById("btn-aligned"),
+                splitPages: document.getElementById("split-pages"),
                 container: document.getElementById("calendarContainer")
             };
 
@@ -245,8 +276,13 @@
             // Création du calendrier
             function createCalendarGrid() {
                 elements.container.innerHTML = '';
-                const yearDisplay = createElement('p', { textContent: state.year });
-                const calendarGrid = createElement('div', { className: 'calendar-grid' });
+                const yearDisplay = createElement('p', { 
+                    className: 'year-title',
+                    textContent: state.year 
+                });
+                const calendarGrid = createElement('div', { 
+                    className: `calendar-grid${state.splitPages ? ' split-pages' : ''}`
+                });
                 const monthColumns = Array.from({ length: 12 }, (_, m) => createMonthColumn(m));
 
                 if (state.layout === 'aligned-weekdays') {
@@ -371,6 +407,10 @@
 
                 elements.btnAligned.addEventListener('click', () =>
                     navigate({ layout: 'aligned-weekdays' }));
+
+                elements.splitPages.checked = state.splitPages;
+                elements.splitPages.addEventListener('change', e =>
+                    navigate({ splitPages: e.target.checked }));
             }
 
             // Initialisation
