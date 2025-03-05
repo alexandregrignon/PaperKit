@@ -154,14 +154,8 @@
             </select>
         </div>
 
-        <div class="button-group">
-            <button id="btn-normal" class="active">Vue standard</button>
-            <button id="btn-aligned">Semaines alignées</button>
-        </div>
-
         <div class="credits">
-            <a
-                href="https://github.com/alexandregrignon/PaperKit">PaperKit</a> &#183; Le Calendrier est adapté en
+            <a href="https://github.com/alexandregrignon/PaperKit">PaperKit</a> &#183; Le Calendrier est adapté en
             Javascript à partir du projet <a href="https://neatnik.net/dispenser/?project=calendar">Calendar</a> réalisé
             par <a href="https://neatnik.net/">Neatnik</a>
         </div>
@@ -175,15 +169,12 @@
             const params = new URLSearchParams(window.location.search);
             const currentYear = new Date().getFullYear();
             const state = {
-                year: params.get('year') ? parseInt(params.get('year')) : currentYear,
-                layout: params.get('layout')
+                year: params.get('year') ? parseInt(params.get('year')) : currentYear
             };
 
             // Initialisation des éléments UI
             const elements = {
                 yearSelect: document.getElementById("year-select"),
-                btnNormal: document.getElementById("btn-normal"),
-                btnAligned: document.getElementById("btn-aligned"),
                 container: document.getElementById("calendarContainer")
             };
 
@@ -193,7 +184,7 @@
                 const newState = { ...state, ...updates };
 
                 Object.entries(newState).forEach(([key, value]) => {
-                    if (value && (key !== 'year' || value !== currentYear)) {
+                    if (value && value !== currentYear) {
                         nextUrl.searchParams.set(key, value);
                     } else {
                         nextUrl.searchParams.delete(key);
@@ -252,81 +243,30 @@
                 const calendarGrid = createElement('div', { 
                     className: 'calendar-grid'
                 });
-                const monthColumns = Array.from({ length: 12 }, (_, m) => createMonthColumn(m));
+                
+                // Vue standard (1-31)
+                for (let m = 0; m < 12; m++) {
+                    const month = createMonthColumn(m);
+                    const daysInMonth = new Date(state.year, m + 1, 0).getDate();
 
-                if (state.layout === 'aligned-weekdays') {
-                    // Calculer d'abord la taille maximale nécessaire
-                    let maxCellCount = 0;
-                    const monthsData = [];
-
-                    // Première passe : calculer le nombre de cellules nécessaire pour chaque mois
-                    for (let m = 0; m < 12; m++) {
-                        const firstDay = new Date(state.year, m, 1);
-                        const daysInMonth = new Date(state.year, m + 1, 0).getDate();
-                        const firstWeekday = (firstDay.getDay() + 6) % 7; // lundi = 0, dimanche = 6
-
-                        const totalCells = firstWeekday + daysInMonth;
-                        maxCellCount = Math.max(maxCellCount, totalCells);
-
-                        monthsData.push({
-                            daysInMonth,
-                            firstWeekday,
-                            totalCells
-                        });
-                    }
-
-                    // Deuxième passe : créer les colonnes avec le bon nombre de cellules
-                    for (let m = 0; m < 12; m++) {
-                        const month = monthColumns[m];
-                        const { daysInMonth, firstWeekday, totalCells } = monthsData[m];
-                        const monthCells = [];
-
-                        // Cellules vides du début
-                        for (let i = 0; i < firstWeekday; i++) {
-                            monthCells.push(createEmptyCell());
-                        }
-
-                        // Jours du mois
-                        for (let day = 1; day <= daysInMonth; day++) {
+                    for (let day = 1; day <= 31; day++) {
+                        if (day <= daysInMonth) {
                             const date = new Date(state.year, m, day);
-                            monthCells.push(createDateCell(date, true));
-                        }
-
-                        // Ajouter des cellules vides pour atteindre la hauteur maximale
-                        const emptyCellsNeeded = maxCellCount - totalCells;
-                        for (let i = 0; i < emptyCellsNeeded; i++) {
-                            monthCells.push(createEmptyCell());
-                        }
-
-                        month.append(...monthCells);
-                    }
-                } else {
-                    // Vue standard (1-31)
-                    for (let m = 0; m < 12; m++) {
-                        const month = monthColumns[m];
-                        const daysInMonth = new Date(state.year, m + 1, 0).getDate();
-
-                        for (let day = 1; day <= 31; day++) {
-                            if (day <= daysInMonth) {
-                                const date = new Date(state.year, m, day);
-                                const cell = createDateCell(date, false);
-                                month.appendChild(cell);
-                            } else {
-                                month.appendChild(createEmptyCell());
-                            }
+                            const cell = createDateCell(date);
+                            month.appendChild(cell);
+                        } else {
+                            month.appendChild(createEmptyCell());
                         }
                     }
+                    calendarGrid.appendChild(month);
                 }
 
-                calendarGrid.append(...monthColumns);
                 elements.container.append(yearDisplay, calendarGrid);
             }
 
-            // Simplification de la fonction createDateCell
-            function createDateCell(date, isAligned = false) {
-                // Convertir pour que lundi = 0, dimanche = 6
+            // Création d'une cellule de date
+            function createDateCell(date) {
                 const weekday = (date.getDay() + 6) % 7;
-
                 const cell = createElement('div', {
                     className: `day-cell${weekday >= 5 ? ' weekend' : ''}`
                 });
@@ -345,17 +285,15 @@
                 return cell;
             }
 
-            // Modifier la création des cellules vides
             function createEmptyCell() {
                 const cell = createElement('div', { className: 'day-cell empty' });
-                // On garde la même structure mais avec des espaces pour maintenir la hauteur
                 const spanDate = createElement('span', {
                     className: 'date',
-                    textContent: '\u00A0\u00A0' // Deux espaces insécables
+                    textContent: '\u00A0\u00A0'
                 });
                 const spanDay = createElement('span', {
                     className: 'day',
-                    textContent: '\u00A0' // Un espace insécable
+                    textContent: '\u00A0'
                 });
                 cell.append(spanDate, ' ', spanDay);
                 return cell;
@@ -365,17 +303,6 @@
             function initializeEventListeners() {
                 elements.yearSelect.addEventListener('change', e =>
                     navigate({ year: parseInt(e.target.value) }));
-
-                if (state.layout === 'aligned-weekdays') {
-                    elements.btnNormal.classList.remove('active');
-                    elements.btnAligned.classList.add('active');
-                }
-
-                elements.btnNormal.addEventListener('click', () =>
-                    navigate({ layout: null }));
-
-                elements.btnAligned.addEventListener('click', () =>
-                    navigate({ layout: 'aligned-weekdays' }));
             }
 
             // Initialisation
