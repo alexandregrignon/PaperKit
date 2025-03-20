@@ -159,6 +159,13 @@
             <button id="btn-aligned">Semaines alignées</button>
         </div>
 
+        <!-- Remplacer le select par des boutons -->
+        <div class="button-group">
+            <button id="btn-full" class="active">Année complète</button>
+            <button id="btn-first">1er semestre</button>
+            <button id="btn-second">2nd semestre</button>
+        </div>
+
         <div class="credits">
             <a
                 href="https://github.com/alexandregrignon/PaperKit">PaperKit</a> &#183; Le Calendrier est adapté en
@@ -176,7 +183,8 @@
             const currentYear = new Date().getFullYear();
             const state = {
                 year: params.get('year') ? parseInt(params.get('year')) : currentYear,
-                layout: params.get('layout')
+                layout: params.get('layout'),
+                period: params.get('period') || 'full'
             };
 
             // Initialisation des éléments UI
@@ -184,6 +192,9 @@
                 yearSelect: document.getElementById("year-select"),
                 btnNormal: document.getElementById("btn-normal"),
                 btnAligned: document.getElementById("btn-aligned"),
+                btnFull: document.getElementById("btn-full"),
+                btnFirst: document.getElementById("btn-first"),
+                btnSecond: document.getElementById("btn-second"),
                 container: document.getElementById("calendarContainer")
             };
 
@@ -252,7 +263,20 @@
                 const calendarGrid = createElement('div', { 
                     className: 'calendar-grid'
                 });
-                const monthColumns = Array.from({ length: 12 }, (_, m) => createMonthColumn(m));
+
+                // Déterminer la plage de mois à afficher
+                let startMonth = 0;
+                let endMonth = 12;
+                if (state.period === 'first') {
+                    endMonth = 6;
+                } else if (state.period === 'second') {
+                    startMonth = 6;
+                }
+
+                const monthColumns = Array.from(
+                    { length: endMonth - startMonth }, 
+                    (_, i) => createMonthColumn(i + startMonth)
+                );
 
                 if (state.layout === 'aligned-weekdays') {
                     // Calculer d'abord la taille maximale nécessaire
@@ -260,7 +284,7 @@
                     const monthsData = [];
 
                     // Première passe : calculer le nombre de cellules nécessaire pour chaque mois
-                    for (let m = 0; m < 12; m++) {
+                    for (let m = startMonth; m < endMonth; m++) {
                         const firstDay = new Date(state.year, m, 1);
                         const daysInMonth = new Date(state.year, m + 1, 0).getDate();
                         const firstWeekday = (firstDay.getDay() + 6) % 7; // lundi = 0, dimanche = 6
@@ -276,7 +300,7 @@
                     }
 
                     // Deuxième passe : créer les colonnes avec le bon nombre de cellules
-                    for (let m = 0; m < 12; m++) {
+                    for (let m = 0; m < monthColumns.length; m++) {
                         const month = monthColumns[m];
                         const { daysInMonth, firstWeekday, totalCells } = monthsData[m];
                         const monthCells = [];
@@ -288,7 +312,7 @@
 
                         // Jours du mois
                         for (let day = 1; day <= daysInMonth; day++) {
-                            const date = new Date(state.year, m, day);
+                            const date = new Date(state.year, m + startMonth, day);
                             monthCells.push(createDateCell(date, true));
                         }
 
@@ -302,13 +326,13 @@
                     }
                 } else {
                     // Vue standard (1-31)
-                    for (let m = 0; m < 12; m++) {
+                    for (let m = 0; m < monthColumns.length; m++) {
                         const month = monthColumns[m];
-                        const daysInMonth = new Date(state.year, m + 1, 0).getDate();
+                        const daysInMonth = new Date(state.year, m + startMonth + 1, 0).getDate();
 
                         for (let day = 1; day <= 31; day++) {
                             if (day <= daysInMonth) {
-                                const date = new Date(state.year, m, day);
+                                const date = new Date(state.year, m + startMonth, day);
                                 const cell = createDateCell(date, false);
                                 month.appendChild(cell);
                             } else {
@@ -376,6 +400,24 @@
 
                 elements.btnAligned.addEventListener('click', () =>
                     navigate({ layout: 'aligned-weekdays' }));
+
+                // Gestion des boutons de période
+                const periodButtons = {
+                    'full': elements.btnFull,
+                    'first': elements.btnFirst,
+                    'second': elements.btnSecond
+                };
+
+                // Mettre à jour le bouton actif
+                Object.entries(periodButtons).forEach(([value, button]) => {
+                    if (value === state.period) {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+
+                    button.addEventListener('click', () => navigate({ period: value }));
+                });
             }
 
             // Initialisation
