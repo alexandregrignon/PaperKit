@@ -340,15 +340,16 @@ option {
 /* Button styles */
 .button-group {
     display: flex;
-    gap: 1em;
     margin: 1em 0;
+    border-radius: 0.2em;
+    overflow: hidden;
+    width: 100%;
 }
 
 button {
     flex: 1;
     padding: 0.5em 1em;
     border: none;
-    border-radius: 0.2em;
     background: #444;
     color: #eee;
     cursor: pointer;
@@ -357,12 +358,18 @@ button {
     transition: background 0.2s;
 }
 
+button:first-child {
+    margin-left: 0; /* Pas de marge négative pour le premier bouton */
+}
+
 button:hover {
     background: #555;
+    border-color: #666;
 }
 
 button.active {
     background: #666;
+    border-color: #777;
 }
 
 /* Media queries */
