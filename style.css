@@ -356,20 +356,20 @@ button {
     font-family: 'Inter', sans-serif;
     font-size: 0.9em;
     transition: background 0.2s;
+    border-right: 1px solid #333;
 }
 
-button:first-child {
-    margin-left: 0; /* Pas de marge négative pour le premier bouton */
+button:last-child {
+    border-right: none;
 }
 
 button:hover {
     background: #555;
-    border-color: #666;
 }
 
 button.active {
     background: #666;
-    border-color: #777;
+    color: #fff;
 }
 
 /* Media queries */

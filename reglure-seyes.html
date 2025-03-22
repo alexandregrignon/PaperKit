@@ -18,12 +18,15 @@
             <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> sur un format de papier A4 pour obtenir un papier Seyès (grands carreaux).</p>
             <p>Format standard : grille de 21 carreaux x 29 carreaux.</p>
             <h2>Options</h2>
-            <div class="slider-group">
-                <div class="slider-header">
-                    <label for="lineHeight">Hauteur des interlignes</label>
-                    <div class="value"><span id="lineHeightValue">2</span> mm</div>
+            <div class="option-group">
+                <div class="option-header">
+                    <label>Hauteur des interlignes</label>
                 </div>
-                <input type="range" id="lineHeight" name="lineHeight" min="2" max="3" step="0.5" value="2">
+                <div class="button-group">
+                    <button data-value="2" class="active">2 mm</button>
+                    <button data-value="2.5">2.5 mm</button>
+                    <button data-value="3">3 mm</button>
+                </div>
             </div>
             <div class="credits">
                 <a href="https://github.com/alexandregrignon/PaperKit">PaperKit</a>
@@ -136,13 +139,18 @@
             }
 
             function updateGrid() {
-                const smallLineSpacing = parseFloat(lineHeightSlider.value);
-                lineHeightValue.textContent = smallLineSpacing;
+                const smallLineSpacing = parseFloat(document.querySelector('.button-group button.active').dataset.value);
                 createGrid(smallLineSpacing);
             }
 
-            // Event listener pour le slider
-            lineHeightSlider.addEventListener("input", updateGrid);
+            // Event listener pour les boutons
+            document.querySelectorAll('.button-group button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    document.querySelectorAll('.button-group button').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    updateGrid();
+                });
+            });
 
             // Création initiale de la grille
             createGrid(2);
