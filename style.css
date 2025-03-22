@@ -372,6 +372,19 @@ button.active {
     color: #fff;
 }
 
+/* Print button styles */
+.print-button {
+    margin: 2em 0 0 0;
+    width: 100%;
+}
+
+.print-button button {
+    width: 100%;
+    padding: 0.8em;
+    border-radius: 0.2em;
+    font-weight: 600;
+}
+
 /* Media queries */
 @media print {
     body {
