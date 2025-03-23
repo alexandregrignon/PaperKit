@@ -103,6 +103,14 @@
             color: #888;
         }
 
+        /* Ajout du style pour l'affichage du numéro de semaine */
+        .week-number {
+            margin-left: auto;
+            font-size: 1.2vmin; /* taille augmentée */
+            font-weight: bold;  /* texte en gras */
+            color: #909090;     /* gris très légèrement plus clair */
+        }
+
         /* Style spécifique pour le titre de l'année */
         .year-title {
             margin: 0 0 .5em 0;
@@ -166,6 +174,15 @@
             <button id="btn-second">2nd semestre</button>
         </div>
 
+        <!-- Réactivation du toggle switch pour masquer/afficher les numéros de semaine -->
+        <div class="toggle-group">
+            <label class="toggle">
+                <input type="checkbox" id="toggle-week-numbers">
+                <span class="slider"></span>
+                <span class="label">Afficher numéros de semaine</span>
+            </label>
+        </div>
+
         <div class="credits">
             <a
                 href="https://github.com/alexandregrignon/PaperKit">PaperKit</a> &#183; Le Calendrier est adapté en
@@ -181,13 +198,15 @@
             // Configuration initiale
             const params = new URLSearchParams(window.location.search);
             const currentYear = new Date().getFullYear();
+            // Toujours afficher les numéros de semaine sans option
             const state = {
                 year: params.get('year') ? parseInt(params.get('year')) : currentYear,
                 layout: params.get('layout'),
-                period: params.get('period') || 'full'
+                period: params.get('period') || 'full',
+                showWeekNumbers: params.get('showWeekNumbers') === '0' ? false : true  // modif.
             };
 
-            // Initialisation des éléments UI
+            // Initialisation des éléments UI (le toggle est retiré)
             const elements = {
                 yearSelect: document.getElementById("year-select"),
                 btnNormal: document.getElementById("btn-normal"),
@@ -195,16 +214,23 @@
                 btnFull: document.getElementById("btn-full"),
                 btnFirst: document.getElementById("btn-first"),
                 btnSecond: document.getElementById("btn-second"),
-                container: document.getElementById("calendarContainer")
+                container: document.getElementById("calendarContainer"),
+                toggleWeekNumbers: document.getElementById("toggle-week-numbers")  // ajout.
             };
 
-            // Fonction utilitaire pour la navigation
+            // Mise à jour du toggle initial selon l'état
+            elements.toggleWeekNumbers.checked = state.showWeekNumbers;
+
+            // Fonction utilitaire pour la navigation (aucune gestion de showWeekNumbers nécessaire)
             function navigate(updates = {}) {
                 const nextUrl = new URL(window.location.href);
                 const newState = { ...state, ...updates };
 
                 Object.entries(newState).forEach(([key, value]) => {
-                    if (value && (key !== 'year' || value !== currentYear)) {
+                    if (key === 'showWeekNumbers') {
+                        // Met à jour en fonction du booléen
+                        nextUrl.searchParams.set(key, value ? '1' : '0');
+                    } else if (value && (key !== 'year' || value !== currentYear)) {
                         nextUrl.searchParams.set(key, value);
                     } else {
                         nextUrl.searchParams.delete(key);
@@ -227,6 +253,14 @@
             // Fonction pour formater une date selon la locale
             function formatDate(date, options) {
                 return date.toLocaleString('fr-FR', options);
+            }
+
+            // Ajout de la fonction pour calculer le numéro ISO de la semaine
+            function getWeekNumber(d) {
+                var date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+                date.setDate(date.getDate() + 4 - (date.getDay() || 7));
+                var yearStart = new Date(date.getFullYear(), 0, 1);
+                return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
             }
 
             // Génération des années dans le select
@@ -285,7 +319,7 @@
 
                     // Première passe : calculer le nombre de cellules nécessaire pour chaque mois
                     for (let m = startMonth; m < endMonth; m++) {
-                        const firstDay = new Date(state.year, m, 1);
+                        const firstDay = new Date(state.year, m);
                         const daysInMonth = new Date(state.year, m + 1, 0).getDate();
                         const firstWeekday = (firstDay.getDay() + 6) % 7; // lundi = 0, dimanche = 6
 
@@ -346,9 +380,9 @@
                 elements.container.append(yearDisplay, calendarGrid);
             }
 
-            // Simplification de la fonction createDateCell
+            // Modification de createDateCell pour afficher le numéro de semaine sans condition
             function createDateCell(date, isAligned = false) {
-                // Convertir pour que lundi = 0, dimanche = 6
+                // Pour que lundi = 0, dimanche = 6
                 const weekday = (date.getDay() + 6) % 7;
 
                 const cell = createElement('div', {
@@ -366,6 +400,15 @@
                 });
 
                 cell.append(spanDate, ' ', spanDay);
+
+                // Toujours afficher le numéro de semaine sur le lundi
+                if (weekday === 0 && state.showWeekNumbers) {  // modif.
+                    const spanWeek = createElement('span', {
+                        className: 'week-number',
+                        textContent: getWeekNumber(date)
+                    });
+                    cell.appendChild(spanWeek);
+                }
                 return cell;
             }
 
@@ -417,6 +460,11 @@
                     }
 
                     button.addEventListener('click', () => navigate({ period: value }));
+                });
+
+                // Ajout de l'écouteur pour le toggle des numéros de semaine
+                elements.toggleWeekNumbers.addEventListener('change', () => {
+                    navigate({ showWeekNumbers: elements.toggleWeekNumbers.checked });
                 });
             }
 
