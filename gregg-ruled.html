@@ -19,13 +19,14 @@
             <h2>Options</h2>
             <div class="option-group">
                 <div class="option-header">
-                    <label for="lineColor">Couleur des lignes</label>
+                    <span>Couleur des lignes</span>
                 </div>
-                <select id="lineColor">
-                    <option value="#a8c7e0">Bleu clair</option>
-                    <option value="#c4c4c4">Gris</option>
-                    <option value="#cfe2cf">Vert clair</option>
-                </select>
+                <!-- Remplacement du select par un groupe de boutons -->
+                <div class="button-group" id="lineColorGroup">
+                    <button data-color="#a8c7e0" class="active">Bleu clair</button>
+                    <button data-color="#c4c4c4">Gris</button>
+                    <button data-color="#cfe2cf">Vert clair</button>
+                </div>
             </div>
             <div class="print-button">
                 <button onclick="window.print()">Imprimer</button>
@@ -48,22 +49,21 @@
             const LINE_SPACING = 8.7; // mm (11/32 inch)
             const CENTER_LINE = pageWidth / 2; // Ligne centrale au milieu de la page
             const svg = document.getElementById("grid");
-            const colorSelect = document.getElementById("lineColor");
+            // Suppression de la référence au select...
+            const colorButtons = document.querySelectorAll("#lineColorGroup button");
+            let currentColor = "#a8c7e0";
 
             function createGrid(lineColor) {
                 // Nombre de lignes sur la hauteur de la page
                 const nLines = Math.floor(pageHeight / LINE_SPACING);
-
                 // Nettoyage du SVG
                 while (svg.firstChild) {
                     svg.removeChild(svg.firstChild);
                 }
-
                 // Création du groupe de lignes
                 const mainLines = document.createElementNS("http://www.w3.org/2000/svg", "g");
                 mainLines.setAttribute("stroke", lineColor);
                 mainLines.setAttribute("stroke-width", "0.5");
-
                 // Lignes horizontales
                 for (let i = 0; i <= nLines; i++) {
                     const y = i * LINE_SPACING;
@@ -74,7 +74,6 @@
                     line.setAttribute("y2", y + "mm");
                     mainLines.appendChild(line);
                 }
-
                 // Ligne verticale centrale en rouge
                 const centerLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
                 centerLine.setAttribute("x1", CENTER_LINE + "mm");
@@ -83,19 +82,24 @@
                 centerLine.setAttribute("y2", pageHeight + "mm");
                 centerLine.setAttribute("stroke", "#ff0000");
                 centerLine.setAttribute("stroke-width", "0.5");
-
                 // Ajout des éléments au SVG
                 svg.appendChild(mainLines);
                 svg.appendChild(centerLine);
             }
 
-            // Event listener pour le sélecteur de couleur
-            colorSelect.addEventListener("change", function() {
-                createGrid(this.value);
+            // Gestion des clics sur les boutons de couleur
+            colorButtons.forEach(btn => {
+                btn.addEventListener("click", function() {
+                    const selectedColor = this.dataset.color;
+                    // Mise à jour de l'état actif
+                    colorButtons.forEach(b => b.classList.remove("active"));
+                    this.classList.add("active");
+                    createGrid(selectedColor);
+                });
             });
 
             // Création initiale de la grille
-            createGrid(colorSelect.value);
+            createGrid(currentColor);
         })();
     </script>
 </body>
