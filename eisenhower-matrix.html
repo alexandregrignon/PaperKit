@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Matrice d'Eisenhower à imprimer avec trame lignée personnalisable. Parfait pour prioriser les tâches selon urgence et importance.">
+    <title>Matrice d'Eisenhower - PaperKit</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="format-a4.css">
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="3d089b60-6919-490c-954f-451842d8f854"></script>
+</head>
+<body>
+    <div id="main">
+        <div id="info">
+            <nav>
+                <a href="index.html">&larr; retour à la liste des modèles</a>
+            </nav>
+            <h1>Matrice d'Eisenhower <span class="badge">A4</span></h1>
+            <p>Cette page est <a href="#" onclick="window.print(); return false;">imprimable</a> sur un format de papier A4. La matrice d'Eisenhower aide à prioriser les tâches selon leur urgence et leur importance.</p>
+            <h2>Options</h2>
+            <div class="slider-group">
+                <div class="slider-header">
+                    <label for="spacing">Espacement des lignes</label>
+                    <div class="value"><span id="spacingValue">7</span> mm</div>
+                </div>
+                <input type="range" id="spacing" name="spacing" min="3" max="10" value="7">
+            </div>
+            <div class="slider-group">
+                <div class="slider-header">
+                    <label for="margin">Marge extérieure</label>
+                    <div class="value"><span id="marginValue">10</span> mm</div>
+                </div>
+                <input type="range" id="margin" name="margin" min="5" max="25" value="10">
+            </div>
+
+            <div class="print-button">
+                <button onclick="window.print()">Imprimer</button>
+            </div>
+            <div class="credits">
+                <a href="https://github.com/alexandregrignon/PaperKit">PaperKit</a>
+            </div>
+        </div>
+        <div class="paper">
+            <svg id="grid" width="210mm" height="297mm" xmlns="http://www.w3.org/2000/svg">
+                <!-- La matrice et les lignes seront générées par le script -->
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+            var pageWidth = 210;
+            var pageHeight = 297;
+            var svg = document.getElementById("grid");
+
+            function createEisenhowerMatrix(spacing, pageMargin) {
+                // Calcul des dimensions de la matrice
+                var matrixWidth = pageWidth - 2 * pageMargin;
+                var matrixHeight = pageHeight - 2 * pageMargin;
+                var matrixX = pageMargin;
+                var matrixY = pageMargin;
+                var matrixMargin = 0; // Marge de la matrice fixée à 0
+
+                // Ajout des lignes de fond dans chaque quadrant
+                var quadrantWidth = matrixWidth / 2;
+                var quadrantHeight = matrixHeight / 2;
+                var topMargin = 20; // Marge haute pour éviter la superposition avec les titres
+
+                // Définition des 4 quadrants avec marge haute
+                var quadrants = [
+                    { x: matrixX, y: matrixY + topMargin }, // Quadrant 1 (haut-gauche)
+                    { x: matrixX + matrixWidth/2, y: matrixY + topMargin }, // Quadrant 2 (haut-droite)
+                    { x: matrixX, y: matrixY + matrixHeight/2 + topMargin }, // Quadrant 3 (bas-gauche)
+                    { x: matrixX + matrixWidth/2, y: matrixY + matrixHeight/2 + topMargin } // Quadrant 4 (bas-droite)
+                ];
+
+                // Création des lignes dans chaque quadrant
+                quadrants.forEach(function(quad, index) {
+                    var effectiveHeight = (index < 2) ? (quadrantHeight - topMargin) : (quadrantHeight - topMargin);
+                    var nHorizontalLines = Math.floor(effectiveHeight / spacing);
+
+                    // Lignes horizontales seulement (pas de lignes verticales)
+                    for (var i = 0; i <= nHorizontalLines; i++) {
+                        var y = quad.y + (i * spacing);
+                        if (y <= quad.y + effectiveHeight) {
+                            var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                            line.setAttribute("x1", quad.x + "mm");
+                            line.setAttribute("y1", y + "mm");
+                            line.setAttribute("x2", (quad.x + quadrantWidth) + "mm");
+                            line.setAttribute("y2", y + "mm");
+                            line.setAttribute("stroke", "#ccc");
+                            line.setAttribute("stroke-width", "0.2mm");
+                            svg.appendChild(line);
+                        }
+                    }
+                });
+
+                // Ajout des labels (toujours affichés)
+                var labels = [
+                    { text: "1. URGENT & IMPORTANT", x: matrixX + matrixWidth * 0.25, y: matrixY + 8, quadrant: 1 },
+                    { text: "2. NON URGENT & IMPORTANT", x: matrixX + matrixWidth * 0.75, y: matrixY + 8, quadrant: 2 },
+                    { text: "3. URGENT & NON IMPORTANT", x: matrixX + matrixWidth * 0.25, y: matrixY + matrixHeight/2 + 8, quadrant: 3 },
+                    { text: "4. NON URGENT & NON IMPORTANT", x: matrixX + matrixWidth * 0.75, y: matrixY + matrixHeight/2 + 8, quadrant: 4 }
+                ];
+
+                var subLabels = [
+                    { text: "À faire en priorité", x: matrixX + matrixWidth * 0.25, y: matrixY + 15, quadrant: 1 },
+                    { text: "À planifier", x: matrixX + matrixWidth * 0.75, y: matrixY + 15, quadrant: 2 },
+                    { text: "À déléguer", x: matrixX + matrixWidth * 0.25, y: matrixY + matrixHeight/2 + 15, quadrant: 3 },
+                    { text: "À éliminer", x: matrixX + matrixWidth * 0.75, y: matrixY + matrixHeight/2 + 15, quadrant: 4 }
+                ];
+
+                labels.forEach(function(label) {
+                    var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute("x", label.x + "mm");
+                    text.setAttribute("y", label.y + "mm");
+                    text.setAttribute("text-anchor", "middle");
+                    text.setAttribute("font-family", "Arial, sans-serif");
+                    text.setAttribute("font-size", "4mm");
+                    text.setAttribute("font-weight", "bold");
+                    text.setAttribute("fill", "#333");
+                    text.textContent = label.text;
+                    svg.appendChild(text);
+                });
+
+                subLabels.forEach(function(label) {
+                    var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute("x", label.x + "mm");
+                    text.setAttribute("y", label.y + "mm");
+                    text.setAttribute("text-anchor", "middle");
+                    text.setAttribute("font-family", "Arial, sans-serif");
+                    text.setAttribute("font-size", "3mm");
+                    text.setAttribute("font-style", "italic");
+                    text.setAttribute("fill", "#666");
+                    text.textContent = label.text;
+                    svg.appendChild(text);
+                });
+
+                // Redessiner les contours principaux au premier plan (plus fins)
+                var mainRectTop = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                mainRectTop.setAttribute("x", matrixX + "mm");
+                mainRectTop.setAttribute("y", matrixY + "mm");
+                mainRectTop.setAttribute("width", matrixWidth + "mm");
+                mainRectTop.setAttribute("height", matrixHeight + "mm");
+                mainRectTop.setAttribute("fill", "none");
+                mainRectTop.setAttribute("stroke", "#000");
+                mainRectTop.setAttribute("stroke-width", "0.3mm");
+                svg.appendChild(mainRectTop);
+
+                // Ligne horizontale centrale au premier plan
+                var hLineTop = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                hLineTop.setAttribute("x1", matrixX + "mm");
+                hLineTop.setAttribute("y1", (matrixY + matrixHeight / 2) + "mm");
+                hLineTop.setAttribute("x2", (matrixX + matrixWidth) + "mm");
+                hLineTop.setAttribute("y2", (matrixY + matrixHeight / 2) + "mm");
+                hLineTop.setAttribute("stroke", "#000");
+                hLineTop.setAttribute("stroke-width", "0.3mm");
+                svg.appendChild(hLineTop);
+
+                // Ligne verticale centrale au premier plan
+                var vLineTop = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                vLineTop.setAttribute("x1", (matrixX + matrixWidth / 2) + "mm");
+                vLineTop.setAttribute("y1", matrixY + "mm");
+                vLineTop.setAttribute("x2", (matrixX + matrixWidth / 2) + "mm");
+                vLineTop.setAttribute("y2", (matrixY + matrixHeight) + "mm");
+                vLineTop.setAttribute("stroke", "#000");
+                vLineTop.setAttribute("stroke-width", "0.3mm");
+                svg.appendChild(vLineTop);
+            }
+
+            var spacingSlider = document.getElementById("spacing");
+            var marginSlider = document.getElementById("margin");
+            var spacingValue = document.getElementById("spacingValue");
+            var marginValue = document.getElementById("marginValue");
+
+            function updateMatrix() {
+                var spacing = parseInt(spacingSlider.value);
+                var pageMargin = parseInt(marginSlider.value);
+
+                spacingValue.textContent = spacing;
+                marginValue.textContent = pageMargin;
+
+                // Clear existing grid
+                while (svg.firstChild) {
+                    svg.removeChild(svg.firstChild);
+                }
+
+                createEisenhowerMatrix(spacing, pageMargin);
+            }
+
+            spacingSlider.addEventListener("input", updateMatrix);
+            marginSlider.addEventListener("input", updateMatrix);
+
+            // Création initiale de la matrice
+            createEisenhowerMatrix(7, 10);
+        })();
+    </script>
+</body>
+</html>
